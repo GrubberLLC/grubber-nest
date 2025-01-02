@@ -83,6 +83,6 @@ app.post('/send-notification', async (req, res) => {
 });
 
 // Start the server
-app.listen(port, () => {
+app.listen(PORT, () => {
   console.log(`Server running at Port: ${PORT}`);
 });
