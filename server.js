@@ -6,6 +6,8 @@ const dotenv = require('dotenv');
 const admin = require('firebase-admin');
 const bodyParser = require('body-parser');
 
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+
 // Load environment variables from .env file
 dotenv.config();
 
@@ -20,7 +22,7 @@ const PORT = process.env.PORT || 3000;
 app.use(bodyParser.json());
 
 admin.initializeApp({
-  credential: admin.credential.cert(require('./serviceAccountKey.json')),
+  credential: admin.credential.cert(serviceAccount),
 });
 
 // Endpoint to send an email
