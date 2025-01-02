@@ -3,6 +3,8 @@
 const express = require('express');
 const sgMail = require('@sendgrid/mail');
 const dotenv = require('dotenv');
+const admin = require('firebase-admin');
+const bodyParser = require('body-parser');
 
 // Load environment variables from .env file
 dotenv.config();
@@ -12,10 +14,14 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // Initialize Express app
 const app = express();
-const port = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Middleware to parse JSON request bodies
-app.use(express.json());
+app.use(bodyParser.json());
+
+admin.initializeApp({
+  credential: admin.credential.cert(require('./serviceAccountKey.json')),
+});
 
 // Endpoint to send an email
 app.post('/send-email', async (req, res) => {
@@ -42,7 +48,39 @@ app.post('/send-email', async (req, res) => {
   }
 });
 
+app.post('/send-notification', async (req, res) => {
+  const { fcmToken, title, body, imageUrl } = req.body;
+
+  if (!fcmToken || !title || !body) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  // Create the notification payload
+  const message = {
+    token: fcmToken,
+    notification: {
+      title: title,
+      body: body,
+      ...(imageUrl && { image: imageUrl }), // Include image if provided
+    },
+    data: {
+      // Additional data can be added here
+      customDataKey: 'customDataValue',
+    },
+  };
+
+  try {
+    // Send the notification
+    const response = await admin.messaging().send(message);
+    console.log('Successfully sent message:', response);
+    res.status(200).json({ message: 'Notification sent successfully', response });
+  } catch (error) {
+    console.error('Error sending notification:', error);
+    res.status(500).json({ error: 'Failed to send notification', details: error.message });
+  }
+});
+
 // Start the server
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server running at Port: ${PORT}`);
 });
