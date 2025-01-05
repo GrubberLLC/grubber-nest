@@ -17,7 +17,7 @@ app.use(cors({
 app.use(bodyParser.json());
 
 admin.initializeApp({
-  credential: admin.credential.cert(require('./etc/secrets/serviceAccountKey.json')),
+  credential: admin.credential.cert(require('/etc/secrets/serviceAccountKey.json')),
 });
 
 app.post('/send-notification', async (req, res) => {
