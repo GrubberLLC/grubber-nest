@@ -2,7 +2,6 @@
 const express = require('express');
 const admin = require('firebase-admin');
 const bodyParser = require('body-parser');
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 const cors = require('cors'); // Import cors middleware\
 const sgMail = require('@sendgrid/mail');
 
@@ -18,7 +17,7 @@ app.use(cors({
 app.use(bodyParser.json());
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+  credential: admin.credential.cert(require('./etc/secrets/serviceAccountKey.json')),
 });
 
 app.post('/send-notification', async (req, res) => {
