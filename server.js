@@ -57,6 +57,12 @@ app.post('/send-notification', async (req, res) => {
   }
 });
 
+const helloRoute = require('./src/routes/hello');
+app.use(helloRoute);
+
+const findPlacesNearby = require('./src/routes/find-places-nearby');
+app.use(findPlacesNearby);
+
 app.listen(PORT, () => {
   console.log(`Notification server is running on http://localhost:${PORT}`);
 });
