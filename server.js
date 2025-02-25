@@ -63,6 +63,9 @@ app.use(helloRoute);
 const findPlacesNearby = require('./src/routes/find-places-nearby');
 app.use(findPlacesNearby);
 
+const deleteUser = require('./src/routes/delete-user');
+app.use(deleteUser);
+
 app.listen(PORT, () => {
   console.log(`Notification server is running on http://localhost:${PORT}`);
 });
