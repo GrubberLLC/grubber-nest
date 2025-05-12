@@ -1,0 +1,34 @@
+# <type>(<scope>): <subject>
+# |<---- Using a maximum of 50 characters ---->|
+# 
+# Example:
+# feat(auth): add OAuth login support
+# fix(api): handle empty response error
+# 
+# type must be one of:
+#   feat:     A new feature
+#   fix:      A bug fix
+#   docs:     Documentation only changes
+#   style:    Changes that do not affect the meaning of the code
+#   refactor: A code change that neither fixes a bug nor adds a feature
+#   perf:     A code change that improves performance
+#   test:     Adding missing tests or correcting existing tests
+#   build:    Changes that affect the build system or external dependencies
+#   ci:       Changes to CI configuration files and scripts
+#   chore:    Other changes that don't modify src or test files
+# 
+# <scope> is optional and refers to a section of the codebase
+# 
+# <body>
+# |<---- Using a maximum of 72 characters ---->|
+# 
+# Explain the problem that this commit is solving. Focus on why you
+# are making this change as opposed to how. Are there side effects
+# or other unintuitive consequences of this change?
+# 
+# <footer>
+# Any references to issues or other context
+# 
+# Example:
+# Fixes #123
+# BREAKING CHANGE: describes a breaking API change 
