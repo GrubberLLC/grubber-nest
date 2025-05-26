@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "strictBindCallApply": false,
+    "strictFunctionTypes": false,
+    "strictPropertyInitialization": false,
+    "noImplicitThis": false,
+    "alwaysStrict": false,
+    // It's common to allow JS files in tests, for example, for mocking or setup
+    "allowJs": true, 
+    // esModuleInterop is already true in the base tsconfig.json,
+    // but explicitly stating it can be helpful for clarity or if the base changes.
+    "esModuleInterop": true 
+  },
+  "include": ["src/**/*.spec.ts", "src/**/*.test.ts", "test/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+} 

@@ -1,6 +1,6 @@
 import {
   GooglePlaceDetailsResult,
-  SupabasePlace,
+  PlaceCoreData,
 } from '../types/places.types.js';
 
 /**
@@ -12,22 +12,48 @@ import {
 export function convertGooglePlacesToSupabasePlaces(
   googlePlaces: GooglePlaceDetailsResult[],
   grubberIdsMap: Map<string, string>,
-): SupabasePlace[] {
+): PlaceCoreData[] {
   return googlePlaces.map((place: GooglePlaceDetailsResult) => {
-    const supabasePlace: Partial<SupabasePlace> = {
+    const longitude = place.location?.longitude;
+    const latitude = place.location?.latitude;
+
+    const supabasePlace: PlaceCoreData = {
       place_id: grubberIdsMap.get(place.id),
-      name: place.displayName.text || place.name || 'Unknown Name',
-      latitude: place.location?.latitude || 0,
-      longitude: place.location?.longitude || 0,
+      name: place.displayName?.text || place.name || 'Unknown Name',
+      latitude: latitude !== undefined ? latitude : 0,
+      longitude: longitude !== undefined ? longitude : 0,
+      location:
+        longitude !== undefined && latitude !== undefined
+          ? `POINT(${longitude} ${latitude})`
+          : '',
       address_full: place.formattedAddress,
       phone_number: place.nationalPhoneNumber,
       business_url: place.websiteUri,
       price: place.priceLevel,
-      category: place.types?.join(','),
+      category: place.types?.join(', '),
       description: place.editorialSummary?.text,
+      weekday_descriptions: place.regularOpeningHours?.weekdayDescriptions,
     };
 
-    return supabasePlace as SupabasePlace;
+    if (
+      !supabasePlace.location &&
+      (latitude !== undefined || longitude !== undefined)
+    ) {
+      console.warn(
+        `Could not form location string for place: ${place.id}, lat: ${latitude}, lng: ${longitude}`,
+      );
+    }
+    if (
+      supabasePlace.latitude === 0 &&
+      supabasePlace.longitude === 0 &&
+      (latitude !== undefined || longitude !== undefined)
+    ) {
+      console.warn(
+        `Defaulted lat/lng to 0 for place: ${place.id} as original values were lat: ${latitude}, lng: ${longitude}`,
+      );
+    }
+
+    return supabasePlace;
   });
 }
 

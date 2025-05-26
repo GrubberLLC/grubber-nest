@@ -14,7 +14,7 @@ import {
   Coordinates,
   GooglePlaceSearchResult,
   GooglePlaceDetailsResult,
-  GooglePhotoData,
+  FetchedGooglePhotoData,
 } from '../../types/places.types.js';
 
 @Injectable()
@@ -55,7 +55,7 @@ export class GooglePlacesApiService {
           params: {
             key: this.GOOGLE_API_KEY,
             location: `${coordinates.latitude},${coordinates.longitude}`,
-            radius: 1500,
+            radius: 5000,
             keyword: searchString,
             type: 'restaurant',
             rankby: 'prominence',
@@ -131,13 +131,13 @@ export class GooglePlacesApiService {
 
   public async fetchPhotoData(
     photoName: string,
-  ): Promise<GooglePhotoData | null> {
+  ): Promise<FetchedGooglePhotoData | null> {
     if (!this.GOOGLE_API_KEY) {
       this.logger.error('GOOGLE_API_KEY not available in fetchPhotoData.');
       throw new InternalServerErrorException('Google API Key not configured.');
     }
     try {
-      const response = await axios.get<GooglePhotoData>(
+      const response = await axios.get<FetchedGooglePhotoData>(
         `${GOOGLE_PLACES_PHOTOS_API_URL}/${photoName}/media`,
         {
           params: {

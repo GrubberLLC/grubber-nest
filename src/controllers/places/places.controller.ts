@@ -10,6 +10,13 @@ import { getErrorMessage } from '../../types/supabase.types.js';
 export class PlacesController {
   constructor(private readonly placesService: PlacesService) {}
 
+  /**
+   * Endpoint to find nearby places (restaurants) based on coordinates and an optional keyword.
+   * It fetches data from the PlacesService, which may involve database lookups and external API calls.
+   * @param findNearbyPlacesDto DTO containing latitude, longitude, and optional keyword.
+   * @returns A promise that resolves to an array of places with their photo information.
+   * @throws HttpException if an unexpected error occurs.
+   */
   @Post('nearby')
   @ApiFindNearbyPlacesResponses()
   async findNearbyPlaces(@Body() findNearbyPlacesDto: FindNearbyPlacesDto) {
