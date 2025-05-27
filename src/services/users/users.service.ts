@@ -17,7 +17,7 @@ export class UsersService {
 
     try {
       // Get client
-      const supabase = this.supabaseService.getClient();
+      const supabase = this.supabaseService.client;
 
       // Fetch all lists owned by the user
       const response = await supabase
@@ -66,7 +66,7 @@ export class UsersService {
     userId: string,
     listIds: string[],
   ): Promise<void> {
-    const supabase = this.supabaseService.getClient();
+    const supabase = this.supabaseService.client;
     try {
       // 1. Delete dependent records first
       if (listIds.length > 0) {
@@ -92,6 +92,68 @@ export class UsersService {
       throw new Error(
         `Failed to delete user-related data: ${getErrorMessage(error)}`,
       );
+    }
+  }
+
+  async login(email: string, password: string): Promise<{ access_token: string; refresh_token: string }> {
+    this.logger.log(`Attempting login for user with email: ${email}`);
+
+    try {
+      const supabase = this.supabaseService.client;
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        throw new Error(`Login failed: ${error.message}`);
+      }
+
+      if (!data.session) {
+        throw new Error('No session data returned from login');
+      }
+
+      this.logger.log(`Successfully logged in user with email: ${email}`);
+      
+      return {
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+      };
+    } catch (error) {
+      this.logger.error(`Error during login: ${getErrorMessage(error)}`);
+      throw error;
+    }
+  }
+
+  async signup(email: string, password: string): Promise<{ access_token: string; refresh_token: string }> {
+    this.logger.log(`Attempting signup for user with email: ${email}`);
+
+    try {
+      const supabase = this.supabaseService.client;
+      
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) {
+        throw new Error(`Signup failed: ${error.message}`);
+      }
+
+      if (!data.session) {
+        throw new Error('No session data returned from signup');
+      }
+
+      this.logger.log(`Successfully signed up user with email: ${email}`);
+      
+      return {
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+      };
+    } catch (error) {
+      this.logger.error(`Error during signup: ${getErrorMessage(error)}`);
+      throw error;
     }
   }
 }

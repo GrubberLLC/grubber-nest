@@ -6,6 +6,10 @@ import { HealthModule } from './health/health.module.js';
 import { SupabaseModule } from './supabase/supabase.module.js';
 import { PlacesModule } from './places/places.module.js';
 import { UsersModule } from './users/users.module.js';
+import { AuthModule } from './auth/auth.module.js';
+import { PreferencesModule } from './preferences/preferences.module.js';
+import { ProfileModule } from './profile/profile.module.js';
+import { SettingsModule } from './settings/settings.module.js';
 
 @Module({
   imports: [
@@ -18,6 +22,10 @@ import { UsersModule } from './users/users.module.js';
     SupabaseModule,
     PlacesModule,
     UsersModule,
+    AuthModule,
+    PreferencesModule,
+    ProfileModule,
+    SettingsModule,
   ],
 })
 export class RootModule {}

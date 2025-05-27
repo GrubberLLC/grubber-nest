@@ -1,0 +1,223 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsArray, IsOptional, IsEnum } from 'class-validator';
+
+export class CreatePreferenceDto {
+  @ApiProperty({
+    description: 'User ID',
+    example: 1,
+    required: true,
+  })
+  @IsString()
+  userId!: string;
+
+  @ApiProperty({
+    description: 'Favorite cuisines',
+    example: ['Italian', 'Japanese', 'Mexican'],
+    required: false,
+    type: [String],
+  })
+  @IsArray()
+  @IsOptional()
+  favoriteCuisines?: string[];
+
+  @ApiProperty({
+    description: 'Least favorite cuisines',
+    example: ['Thai', 'Indian'],
+    required: false,
+    type: [String],
+  })
+  @IsArray()
+  @IsOptional()
+  leastFavoriteCuisines?: string[];
+
+  @ApiProperty({
+    description: 'Cuisines willing to try',
+    example: ['Korean', 'Ethiopian'],
+    required: false,
+    type: [String],
+  })
+  @IsArray()
+  @IsOptional()
+  cuisinesWillingToTry?: string[];
+
+  @ApiProperty({
+    description: 'Diet type',
+    example: 'Vegetarian',
+    required: true,
+  })
+  @IsString()
+  dietType!: string;
+
+  @ApiProperty({
+    description: 'Food allergies',
+    example: ['Peanuts', 'Shellfish'],
+    required: true,
+    type: [String],
+  })
+  @IsArray()
+  foodAllergies!: string[];
+
+  @ApiProperty({
+    description: 'Health preferences',
+    example: ['Low-carb', 'High-protein'],
+    required: false,
+    type: [String],
+  })
+  @IsArray()
+  @IsOptional()
+  healthPreferences?: string[];
+
+  @ApiProperty({
+    description: 'Dietary restrictions',
+    example: 'Halal',
+    required: true,
+  })
+  @IsString()
+  dietaryRestrictions!: string;
+
+  @ApiProperty({
+    description: 'Preferred meal types',
+    example: ['Breakfast', 'Dinner'],
+    required: false,
+    type: [String],
+  })
+  @IsArray()
+  @IsOptional()
+  preferredMealTypes?: string[];
+
+  @ApiProperty({
+    description: 'Dining time preferences',
+    example: ['Evening', 'Late Night'],
+    required: false,
+    type: [String],
+  })
+  @IsArray()
+  @IsOptional()
+  diningTimePreferences?: string[];
+
+  @ApiProperty({
+    description: 'Meal occasion preferences',
+    example: ['Casual', 'Fine Dining'],
+    required: false,
+    type: [String],
+  })
+  @IsArray()
+  @IsOptional()
+  mealOccasionPreferences?: string[];
+
+  @ApiProperty({
+    description: 'Preferred flavors',
+    example: ['Sweet', 'Spicy'],
+    required: false,
+    type: [String],
+  })
+  @IsArray()
+  @IsOptional()
+  preferredFlavors?: string[];
+
+  @ApiProperty({
+    description: 'Disliked flavors',
+    example: ['Bitter', 'Sour'],
+    required: false,
+    type: [String],
+  })
+  @IsArray()
+  @IsOptional()
+  dislikedFlavors?: string[];
+
+  @ApiProperty({
+    description: 'Preferred atmosphere',
+    example: ['Cozy', 'Vibrant'],
+    required: false,
+    type: [String],
+  })
+  @IsArray()
+  @IsOptional()
+  preferredAtmosphere?: string[];
+
+  @ApiProperty({
+    description: 'Dining companions',
+    example: ['Family', 'Friends'],
+    required: false,
+    type: [String],
+  })
+  @IsArray()
+  @IsOptional()
+  diningCompanions?: string[];
+
+  @ApiProperty({
+    description: 'Dining frequency',
+    example: 'Weekly',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  diningFrequency?: string;
+
+  @ApiProperty({
+    description: 'Primary location',
+    example: 'New York City',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  primaryLocation?: string;
+
+  @ApiProperty({
+    description: 'Travel distance',
+    example: 'Medium',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  travelDistance?: string;
+
+  @ApiProperty({
+    description: 'Willingness to explore',
+    example: 'High',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  willingnessToExplore?: string;
+
+  @ApiProperty({
+    description: 'Rating criteria',
+    example: ['Taste', 'Service'],
+    required: false,
+    type: [String],
+  })
+  @IsArray()
+  @IsOptional()
+  ratingCriteria?: string[];
+}
+
+export class UpdatePreferenceDto extends CreatePreferenceDto {
+  @ApiProperty({
+    description: 'Preference ID',
+    example: 1,
+    required: true,
+  })
+  @IsString()
+  preferenceId!: string;
+}
+
+export class GetPreferenceDto {
+  @ApiProperty({
+    description: 'User ID',
+    example: 1,
+    required: true,
+  })
+  @IsString()
+  userId!: string;
+}
+
+export class DeletePreferenceDto {
+  @ApiProperty({
+    description: 'Preference ID',
+    example: 1,
+    required: true,
+  })
+  @IsString()
+  preferenceId!: string;
+}

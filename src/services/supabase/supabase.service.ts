@@ -1,6 +1,6 @@
-import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { SupabaseClient, createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { getErrorMessage } from '../../types/supabase.types.js';
 
 @Injectable()
@@ -13,30 +13,28 @@ export class SupabaseService implements OnModuleInit {
   onModuleInit() {
     try {
       const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
-      const supabaseServiceRoleKey = this.configService.get<string>(
-        'SUPABASE_SERVICE_ROLE_KEY',
-      );
+      const supabaseServiceRoleKey = this.configService.get<string>('SUPABASE_SERVICE_ROLE_KEY');
 
       if (!supabaseUrl || !supabaseServiceRoleKey) {
-        this.logger.error('Supabase configuration is missing!');
-        throw new Error('Supabase configuration is missing!');
+        throw new Error('Missing Supabase configuration');
       }
 
       // Using a single client with admin privileges
-      // Type assertion is needed due to strict TypeScript setting
-      this.supabaseClient = createClient(supabaseUrl, supabaseServiceRoleKey);
+      this.supabaseClient = createClient(supabaseUrl, supabaseServiceRoleKey, {
+        auth: {
+          autoRefreshToken: true,
+          persistSession: true,
+        },
+      });
 
       this.logger.log('Supabase client initialized successfully.');
     } catch (error) {
-      this.logger.error(
-        'Failed to initialize Supabase client:',
-        getErrorMessage(error),
-      );
+      this.logger.error('Failed to initialize Supabase client:', error);
       throw error;
     }
   }
 
-  getClient(): SupabaseClient {
+  get client(): SupabaseClient {
     if (!this.supabaseClient) {
       throw new Error('Supabase client not initialized');
     }
@@ -45,6 +43,6 @@ export class SupabaseService implements OnModuleInit {
 
   // Keep this method for backward compatibility
   getAdminClient(): SupabaseClient {
-    return this.getClient();
+    return this.client;
   }
 }
