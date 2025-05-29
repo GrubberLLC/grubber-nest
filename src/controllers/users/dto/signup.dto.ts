@@ -21,4 +21,4 @@ export class SignupDto {
   @IsString()
   @MinLength(8)
   password!: string;
-} 
+}

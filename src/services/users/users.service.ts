@@ -1,10 +1,26 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service.js';
 import {
   ListRecord,
   SupabaseResponse,
   getErrorMessage,
 } from '../../types/supabase.types.js';
+import { CreateUserDto } from '../../controllers/users/dto/create-user.dto.js';
+import { UpdateUserDto } from '../../controllers/users/dto/update-user.dto.js';
+import {
+  PostgrestSingleResponse,
+  PostgrestResponse,
+} from '@supabase/supabase-js';
+
+export interface User {
+  id: string;
+  email: string;
+  username: string;
+  avatar_url?: string;
+  created_at: string;
+  updated_at: string;
+  user_metadata: Record<string, unknown>;
+}
 
 @Injectable()
 export class UsersService {
@@ -95,12 +111,15 @@ export class UsersService {
     }
   }
 
-  async login(email: string, password: string): Promise<{ access_token: string; refresh_token: string }> {
+  async login(
+    email: string,
+    password: string,
+  ): Promise<{ access_token: string; refresh_token: string }> {
     this.logger.log(`Attempting login for user with email: ${email}`);
 
     try {
       const supabase = this.supabaseService.client;
-      
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -115,7 +134,7 @@ export class UsersService {
       }
 
       this.logger.log(`Successfully logged in user with email: ${email}`);
-      
+
       return {
         access_token: data.session.access_token,
         refresh_token: data.session.refresh_token,
@@ -126,12 +145,15 @@ export class UsersService {
     }
   }
 
-  async signup(email: string, password: string): Promise<{ access_token: string; refresh_token: string }> {
+  async signup(
+    email: string,
+    password: string,
+  ): Promise<{ access_token: string; refresh_token: string }> {
     this.logger.log(`Attempting signup for user with email: ${email}`);
 
     try {
       const supabase = this.supabaseService.client;
-      
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -146,7 +168,7 @@ export class UsersService {
       }
 
       this.logger.log(`Successfully signed up user with email: ${email}`);
-      
+
       return {
         access_token: data.session.access_token,
         refresh_token: data.session.refresh_token,
@@ -155,5 +177,96 @@ export class UsersService {
       this.logger.error(`Error during signup: ${getErrorMessage(error)}`);
       throw error;
     }
+  }
+
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const response = await this.supabaseService.client
+      .from('users')
+      .insert(createUserDto)
+      .select()
+      .single();
+
+    const { data, error } = response as PostgrestSingleResponse<User>;
+
+    if (error) throw error;
+    return data;
+  }
+
+  async findAll(): Promise<User[]> {
+    const response = await this.supabaseService.client
+      .from('users')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    const { data, error } = response as PostgrestResponse<User>;
+
+    if (error) throw error;
+    return data;
+  }
+
+  async findOne(id: string): Promise<User> {
+    const response = await this.supabaseService.client
+      .from('users')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    const { data, error } = response as PostgrestSingleResponse<User>;
+
+    if (error || !data) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    return data;
+  }
+
+  async findByEmail(email: string): Promise<User> {
+    const response = await this.supabaseService.client
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
+
+    const { data, error } = response as PostgrestSingleResponse<User>;
+
+    if (error || !data) {
+      throw new NotFoundException(`User with email ${email} not found`);
+    }
+
+    return data;
+  }
+
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const response = await this.supabaseService.client
+      .from('users')
+      .update(updateUserDto)
+      .eq('id', id)
+      .select()
+      .single();
+
+    const { data, error } = response as PostgrestSingleResponse<User>;
+
+    if (error || !data) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    return data;
+  }
+
+  async remove(id: string): Promise<User> {
+    const response = await this.supabaseService.client
+      .from('users')
+      .delete()
+      .eq('id', id)
+      .select()
+      .single();
+
+    const { data, error } = response as PostgrestSingleResponse<User>;
+
+    if (error || !data) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    return data;
   }
 }

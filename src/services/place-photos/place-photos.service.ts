@@ -35,7 +35,7 @@ export class PlacePhotoService {
     placeDetail: GooglePlaceDetailsResult,
     internalPlaceId: string,
   ): Promise<void> {
-    const supabase = this.supabaseService.getClient();
+    const supabase = this.supabaseService.client;
 
     const { count: existingPhotoCount, error: countError } = await supabase
       .from('PlacePhotos')
@@ -195,7 +195,7 @@ export class PlacePhotoService {
     });
 
     try {
-      const supabase = this.supabaseService.getClient();
+      const supabase = this.supabaseService.client;
       const { error } = await supabase
         .from('PlacePhotos')
         .upsert(photosToInsert, {
@@ -234,7 +234,7 @@ export class PlacePhotoService {
     if (!places || places.length === 0) {
       return [];
     }
-    const supabase = this.supabaseService.getClient();
+    const supabase = this.supabaseService.client;
 
     // get the place ids
     const placeIds = places

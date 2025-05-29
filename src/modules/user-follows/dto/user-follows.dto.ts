@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsEnum } from 'class-validator';
 
 export enum FollowStatus {
@@ -12,8 +13,13 @@ export enum FollowActive {
 }
 
 export class CreateUserFollowDto {
+  @ApiProperty({ description: 'ID of the user being followed' })
   @IsString()
   followed_id!: string;
+
+  @ApiProperty({ description: 'ID of the user who is following' })
+  @IsString()
+  follower_id!: string;
 
   @IsEnum(FollowStatus)
   follow_status: FollowStatus = FollowStatus.PENDING;
@@ -23,9 +29,13 @@ export class CreateUserFollowDto {
 }
 
 export class UpdateUserFollowDto {
+  @ApiProperty({ description: 'ID of the user being followed' })
+  @IsString()
+  followed_id?: string;
+
   @IsEnum(FollowStatus)
   follow_status!: FollowStatus;
 
   @IsEnum(FollowActive)
   follow_active!: FollowActive;
-} 
+}

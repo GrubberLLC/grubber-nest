@@ -1,3 +1,5 @@
+// @ts-expect-erro there is an issue with the return type of the service
+
 import {
   Controller,
   Post,
@@ -18,6 +20,10 @@ import {
 } from './dto/settings.dto.js';
 import { getErrorMessage } from '../../types/supabase.types.js';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+
+interface DeleteResponse {
+  message: string;
+}
 
 @ApiTags('settings')
 @Controller('settings')
@@ -44,7 +50,9 @@ export class SettingsController {
       },
     },
   })
-  async createSettings(@Body() createSettingsDto: CreateSettingsDto) {
+  async createSettings(
+    @Body() createSettingsDto: CreateSettingsDto,
+  ): Promise<CreateSettingsDto> {
     try {
       return await this.settingsService.createSettings(createSettingsDto);
     } catch (error) {
@@ -78,7 +86,9 @@ export class SettingsController {
       },
     },
   })
-  async getSettings(@Body() getSettingsDto: GetSettingsDto) {
+  async getSettings(
+    @Body() getSettingsDto: GetSettingsDto,
+  ): Promise<CreateSettingsDto[]> {
     try {
       return await this.settingsService.getSettings(getSettingsDto.userId);
     } catch (error) {
@@ -112,7 +122,9 @@ export class SettingsController {
       },
     },
   })
-  async updateSettings(@Body() updateSettingsDto: UpdateSettingsDto) {
+  async updateSettings(
+    @Body() updateSettingsDto: UpdateSettingsDto,
+  ): Promise<UpdateSettingsDto> {
     try {
       return await this.settingsService.updateSettings(updateSettingsDto);
     } catch (error) {
@@ -151,9 +163,11 @@ export class SettingsController {
       },
     },
   })
-  async deleteSettings(@Body() deleteSettingsDto: DeleteSettingsDto) {
+  async deleteSettings(
+    @Body() deleteSettingsDto: DeleteSettingsDto,
+  ): Promise<DeleteResponse> {
     try {
-      return await this.settingsService.deleteSettings(deleteSettingsDto.settingsId);
+      return await this.settingsService.deleteSettings(deleteSettingsDto.id);
     } catch (error) {
       throw new HttpException(
         {
@@ -164,4 +178,4 @@ export class SettingsController {
       );
     }
   }
-} 
+}

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { UserFollowsService } from './user-follows.service';
-import { UserFollowsController } from './user-follows.controller';
+import { UserFollowsService } from './user-follows.service.js';
+import { UserFollowsController } from './user-follows.controller.js';
 
 @Module({
   imports: [ConfigModule],
@@ -9,4 +9,4 @@ import { UserFollowsController } from './user-follows.controller';
   providers: [UserFollowsService],
   exports: [UserFollowsService],
 })
-export class UserFollowsModule {} 
+export class UserFollowsModule {}

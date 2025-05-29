@@ -7,11 +7,14 @@ import {
   Param,
   Delete,
   UseGuards,
-  Request,
 } from '@nestjs/common';
-import { NotificationsService } from './notifications.service';
-import { CreateNotificationDto, UpdateNotificationDto } from './dto/notifications.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { NotificationsService } from './notifications.service.js';
+import {
+  CreateNotificationDto,
+  UpdateNotificationDto,
+} from './dto/notifications.dto.js';
+import { JwtAuthGuard } from '../../services/auth/guards/jwt-auth.guard.js';
+import { GetUser } from '../../controllers/auth/decorators/get-user.decorator.js';
 
 @Controller('notifications')
 @UseGuards(JwtAuthGuard)
@@ -19,8 +22,11 @@ export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   @Post()
-  create(@Request() req, @Body() createNotificationDto: CreateNotificationDto) {
-    return this.notificationsService.create(req.user.userId, createNotificationDto);
+  create(
+    @GetUser('userId') userId: string,
+    @Body() createNotificationDto: CreateNotificationDto,
+  ) {
+    return this.notificationsService.create(userId, createNotificationDto);
   }
 
   @Get()
@@ -29,13 +35,13 @@ export class NotificationsController {
   }
 
   @Get('me')
-  findMyNotifications(@Request() req) {
-    return this.notificationsService.findByUserId(req.user.userId);
+  findMyNotifications(@GetUser('userId') userId: string) {
+    return this.notificationsService.findByUserId(userId);
   }
 
   @Get('me/unread')
-  findMyUnreadNotifications(@Request() req) {
-    return this.notificationsService.findUnreadByUserId(req.user.userId);
+  findMyUnreadNotifications(@GetUser('userId') userId: string) {
+    return this.notificationsService.findUnreadByUserId(userId);
   }
 
   @Get(':id')
@@ -57,12 +63,12 @@ export class NotificationsController {
   }
 
   @Patch('me/read-all')
-  markAllAsRead(@Request() req) {
-    return this.notificationsService.markAllAsRead(req.user.userId);
+  markAllAsRead(@GetUser('userId') userId: string) {
+    return this.notificationsService.markAllAsRead(userId);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.notificationsService.remove(+id);
   }
-} 
+}

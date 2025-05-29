@@ -79,4 +79,4 @@ export class DeleteNotificationDto {
   })
   @IsString()
   notificationId!: string;
-} 
+}

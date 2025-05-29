@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsBoolean, IsOptional, IsEmail, IsPhoneNumber } from 'class-validator';
+import {
+  IsString,
+  IsBoolean,
+  IsOptional,
+  IsEmail,
+  IsPhoneNumber,
+} from 'class-validator';
 
 export class CreateProfileDto {
   @ApiProperty({
@@ -158,4 +164,4 @@ export class DeleteProfileDto {
   })
   @IsString()
   id!: string;
-} 
+}

@@ -2,14 +2,17 @@ import {
   Controller,
   Post,
   Body,
+  UseGuards,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
 import { AuthService } from '../../services/auth/auth.service.js';
 import { LoginDto } from './dto/login.dto.js';
 import { SignupDto } from './dto/signup.dto.js';
+import { JwtAuthGuard } from '../../services/auth/guards/jwt-auth.guard.js';
+import { GetUser } from './decorators/get-user.decorator.js';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ApiLogin, ApiSignup, ApiRefreshToken } from '../../decorators/swagger/index.js';
+import { ApiSignup } from '../../decorators/swagger/index.js';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -18,52 +21,22 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Login with email and password' })
+  @ApiOperation({ summary: 'User login' })
   @ApiResponse({
-    status: 200,
-    description: 'Login successful',
-    schema: {
-      type: 'object',
-      properties: {
-        user: {
-          type: 'object',
-          properties: {
-            id: { type: 'string' },
-            email: { type: 'string' },
-            // Add other user properties as needed
-          },
-        },
-        session: {
-          type: 'object',
-          properties: {
-            access_token: { type: 'string' },
-            refresh_token: { type: 'string' },
-            // Add other session properties as needed
-          },
-        },
-      },
-    },
+    status: HttpStatus.OK,
+    description: 'User successfully logged in',
   })
   @ApiResponse({
-    status: 401,
+    status: HttpStatus.UNAUTHORIZED,
     description: 'Invalid credentials',
   })
-  async login(@Body() loginD
+  async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
 
   @Post('signup')
   @HttpCode(HttpStatus.CREATED)
   @ApiSignup()
-  async signup(@Body() signupDto: { email: string; password: string; username: string }) {
-    return this.authService.signup(signupDto);
-  }
-
-  @Post('refresh-token')
-  @HttpCode(HttpStatus.OK)
-  @ApiRefreshToken()
-  async refreshToken(@Body() refreshTokenDto: { refreshToken: string }) {
-    return this.authService.refreshToken(refreshTokenDto);
   @ApiOperation({ summary: 'Sign up with email and password' })
   @ApiResponse({
     status: 201,
@@ -104,23 +77,22 @@ export class AuthController {
   }
 
   @Post('logout')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Logout current user' })
-  @ApiResponse({
-    status: 200,
-    description: 'Logout successful',
-    schema: {
-      type: 'object',
-      properties: {
-        message: { type: 'string', example: 'Successfully logged out' },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Not authenticated or logout failed',
-  })
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Logout user' })
+  @ApiResponse({ status: 200, description: 'User logged out successfully' })
   async logout() {
     return this.authService.logout();
   }
-} 
+
+  @Post('refresh')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Refresh access token' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Token successfully refreshed',
+  })
+  async refreshToken(@GetUser('userId') userId: string) {
+    return this.authService.refreshToken(userId);
+  }
+}

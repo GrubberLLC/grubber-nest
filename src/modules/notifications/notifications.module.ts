@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { NotificationsService } from './notifications.service';
-import { NotificationsController } from './notifications.controller';
+import { NotificationsService } from '../../services/notifications/notifications.service.js';
+import { NotificationsController } from './notifications.controller.js';
+import { SupabaseService } from '../../services/supabase/supabase.service.js';
 
 @Module({
-  imports: [ConfigModule],
   controllers: [NotificationsController],
-  providers: [NotificationsService],
+  providers: [NotificationsService, SupabaseService],
   exports: [NotificationsService],
 })
 export class NotificationsModule {}

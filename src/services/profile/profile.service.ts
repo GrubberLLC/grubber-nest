@@ -1,7 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service.js';
 import { getErrorMessage } from '../../types/supabase.types.js';
-import { CreateProfileDto, UpdateProfileDto } from '../../controllers/profile/dto/profile.dto.js';
+import {
+  CreateProfileDto,
+  UpdateProfileDto,
+} from '../../controllers/profile/dto/profile.dto.js';
 
 @Injectable()
 export class ProfileService {
@@ -14,25 +17,27 @@ export class ProfileService {
 
     try {
       const supabase = this.supabaseService.client;
-      
+
       const { data, error } = await supabase
         .from('Profile')
-        .insert([{
-          user_id: profileData.userId,
-          username: profileData.username,
-          email: profileData.email,
-          first_name: profileData.firstName,
-          last_name: profileData.lastName,
-          bio: profileData.bio,
-          phone: profileData.phone,
-          verified: profileData.verified ?? false,
-          public: profileData.public ?? true,
-          profile_picture: profileData.profilePicture,
-          fcm_token: profileData.fcmToken,
-          account_name: profileData.accountName,
-          show_tutorial: profileData.showTutorial ?? true,
-          testing: profileData.testing ?? false
-        }])
+        .insert([
+          {
+            user_id: profileData.userId,
+            username: profileData.username,
+            email: profileData.email,
+            first_name: profileData.firstName,
+            last_name: profileData.lastName,
+            bio: profileData.bio,
+            phone: profileData.phone,
+            verified: profileData.verified ?? false,
+            public: profileData.public ?? true,
+            profile_picture: profileData.profilePicture,
+            fcm_token: profileData.fcmToken,
+            account_name: profileData.accountName,
+            show_tutorial: profileData.showTutorial ?? true,
+            testing: profileData.testing ?? false,
+          },
+        ])
         .select()
         .single();
 
@@ -52,7 +57,7 @@ export class ProfileService {
 
     try {
       const supabase = this.supabaseService.client;
-      
+
       const { data, error } = await supabase
         .from('Profile')
         .select('*')
@@ -75,7 +80,7 @@ export class ProfileService {
 
     try {
       const supabase = this.supabaseService.client;
-      
+
       const { data, error } = await supabase
         .from('Profile')
         .update({
@@ -91,7 +96,7 @@ export class ProfileService {
           fcm_token: profileData.fcmToken,
           account_name: profileData.accountName,
           show_tutorial: profileData.showTutorial,
-          testing: profileData.testing
+          testing: profileData.testing,
         })
         .eq('id', profileData.id)
         .select()
@@ -113,7 +118,7 @@ export class ProfileService {
 
     try {
       const supabase = this.supabaseService.client;
-      
+
       const { error } = await supabase
         .from('Profile')
         .delete()
@@ -129,4 +134,4 @@ export class ProfileService {
       throw error;
     }
   }
-} 
+}

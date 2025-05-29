@@ -13,11 +13,12 @@ import { PreferencesService } from '../../services/preferences/preferences.servi
 import {
   CreatePreferenceDto,
   UpdatePreferenceDto,
-  GetPreferenceDto,
-  DeletePreferenceDto,
 } from './dto/preferences.dto.js';
-import { getErrorMessage } from '../../types/supabase.types.js';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+
+interface DeleteResponse {
+  message: string;
+}
 
 @ApiTags('preferences')
 @Controller('preferences')
@@ -26,11 +27,11 @@ export class PreferencesController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create user preferences' })
+  @ApiOperation({ summary: 'Create preference' })
   @ApiBody({ type: CreatePreferenceDto })
   @ApiResponse({
     status: 201,
-    description: 'Preferences successfully created',
+    description: 'Preference successfully created',
     type: CreatePreferenceDto,
   })
   @ApiResponse({
@@ -44,14 +45,23 @@ export class PreferencesController {
       },
     },
   })
-  async createPreference(@Body() createPreferenceDto: CreatePreferenceDto) {
+  async createPreference(
+    @Body() createPreferenceDto: CreatePreferenceDto,
+  ): Promise<CreatePreferenceDto> {
     try {
-      return await this.preferencesService.createPreference(createPreferenceDto);
-    } catch (error) {
+      const result: CreatePreferenceDto | null =
+        await this.preferencesService.create(createPreferenceDto);
+      if (!result) {
+        throw new Error('Failed to create preference');
+      }
+      return result;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       throw new HttpException(
         {
-          error: 'Failed to create preferences',
-          details: getErrorMessage(error),
+          error: 'Failed to create preference',
+          details: errorMessage,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -60,8 +70,7 @@ export class PreferencesController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get user preferences' })
-  @ApiBody({ type: GetPreferenceDto })
+  @ApiOperation({ summary: 'Get preferences' })
   @ApiResponse({
     status: 200,
     description: 'Preferences successfully retrieved',
@@ -78,14 +87,20 @@ export class PreferencesController {
       },
     },
   })
-  async getPreferences(@Body() getPreferenceDto: GetPreferenceDto) {
+  async getPreferences(
+    @Body('userId') userId: string,
+  ): Promise<CreatePreferenceDto[]> {
     try {
-      return await this.preferencesService.getPreferences(getPreferenceDto.userId);
-    } catch (error) {
+      const result: CreatePreferenceDto[] =
+        await this.preferencesService.findAll(userId);
+      return result;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       throw new HttpException(
         {
           error: 'Failed to get preferences',
-          details: getErrorMessage(error),
+          details: errorMessage,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -94,11 +109,11 @@ export class PreferencesController {
 
   @Put()
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Update user preferences' })
+  @ApiOperation({ summary: 'Update preference' })
   @ApiBody({ type: UpdatePreferenceDto })
   @ApiResponse({
     status: 200,
-    description: 'Preferences successfully updated',
+    description: 'Preference successfully updated',
     type: UpdatePreferenceDto,
   })
   @ApiResponse({
@@ -112,14 +127,26 @@ export class PreferencesController {
       },
     },
   })
-  async updatePreference(@Body() updatePreferenceDto: UpdatePreferenceDto) {
+  async updatePreference(
+    @Body() updatePreferenceDto: UpdatePreferenceDto,
+  ): Promise<UpdatePreferenceDto> {
     try {
-      return await this.preferencesService.updatePreference(updatePreferenceDto);
-    } catch (error) {
+      const result: UpdatePreferenceDto | null =
+        await this.preferencesService.update(
+          updatePreferenceDto.preferenceId,
+          updatePreferenceDto,
+        );
+      if (!result) {
+        throw new Error('Failed to update preference');
+      }
+      return result;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       throw new HttpException(
         {
-          error: 'Failed to update preferences',
-          details: getErrorMessage(error),
+          error: 'Failed to update preference',
+          details: errorMessage,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -128,15 +155,18 @@ export class PreferencesController {
 
   @Delete()
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Delete user preferences' })
-  @ApiBody({ type: DeletePreferenceDto })
+  @ApiOperation({ summary: 'Delete preference' })
+  @ApiBody({ type: UpdatePreferenceDto })
   @ApiResponse({
     status: 200,
-    description: 'Preferences successfully deleted',
+    description: 'Preference successfully deleted',
     schema: {
       type: 'object',
       properties: {
-        message: { type: 'string', example: 'Preference deleted successfully' },
+        message: {
+          type: 'string',
+          example: 'Preference deleted successfully',
+        },
       },
     },
   })
@@ -151,14 +181,23 @@ export class PreferencesController {
       },
     },
   })
-  async deletePreference(@Body() deletePreferenceDto: DeletePreferenceDto) {
+  async deletePreference(
+    @Body('preferenceId') preferenceId: string,
+  ): Promise<DeleteResponse> {
     try {
-      return await this.preferencesService.deletePreference(deletePreferenceDto.preferenceId);
-    } catch (error) {
+      const result: DeleteResponse | null =
+        await this.preferencesService.remove(preferenceId);
+      if (!result) {
+        throw new Error('Failed to delete preference');
+      }
+      return result;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       throw new HttpException(
         {
-          error: 'Failed to delete preferences',
-          details: getErrorMessage(error),
+          error: 'Failed to delete preference',
+          details: errorMessage,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );

@@ -18,7 +18,7 @@ export class SupabasePlaceDataService {
   constructor(private readonly supabaseService: SupabaseService) {}
 
   private getClient(): SupabaseClient {
-    return this.supabaseService.getClient();
+    return this.supabaseService.client;
   }
 
   /**
@@ -38,7 +38,7 @@ export class SupabasePlaceDataService {
       `Getting closest places from Supabase near lat:${latitude}, long:${longitude}, keyword:${keyword || 'any'}`,
     );
     try {
-      const supabase = this.getClient();
+      const supabase = this.supabaseService.client;
       let query = supabase
         .from('Places')
         .select('*')
@@ -81,7 +81,7 @@ export class SupabasePlaceDataService {
       return;
     }
     try {
-      const supabase = this.getClient();
+      const supabase = this.supabaseService.client;
       const { error } = await supabase.from('Places').upsert(places, {
         onConflict: 'place_id', // Assuming 'place_id' is your unique identifier for places
       });
@@ -124,7 +124,7 @@ export class SupabasePlaceDataService {
     this.logger.log(
       `Attempting fuzzy match for '${placeName}' at ${placeLat}, ${placeLng}`,
     );
-    const supabase = this.getClient();
+    const supabase = this.supabaseService.client;
 
     // Define a type for the expected shape of potential matches for clarity
     type PotentialMatch = {
@@ -223,7 +223,7 @@ export class SupabasePlaceDataService {
   public async getExternalPlaceIdMapping(
     googleId: string,
   ): Promise<string | null> {
-    const supabase = this.getClient();
+    const supabase = this.supabaseService.client;
     const { data, error } = await supabase
       .from('ExternalPlacesIds')
       .select('id') // This is the internal place_id
@@ -252,7 +252,7 @@ export class SupabasePlaceDataService {
     internalPlaceId: string,
     googleId: string,
   ): Promise<void> {
-    const supabase = this.getClient();
+    const supabase = this.supabaseService.client;
     const { error } = await supabase
       .from('ExternalPlacesIds')
       .insert({ id: internalPlaceId, google_id: googleId });

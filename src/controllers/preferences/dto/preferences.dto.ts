@@ -1,5 +1,52 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsArray, IsOptional, IsEnum } from 'class-validator';
+import { IsString, IsBoolean, IsArray, IsOptional } from 'class-validator';
+
+export class CreatePreferencesDto {
+  @ApiProperty({ description: 'ID of the user' })
+  @IsString()
+  user_id!: string;
+
+  @ApiProperty({ description: 'User theme preference' })
+  @IsString()
+  theme!: string;
+
+  @ApiProperty({ description: 'User language preference' })
+  @IsString()
+  language!: string;
+
+  @ApiProperty({ description: 'Whether notifications are enabled' })
+  @IsBoolean()
+  notifications_enabled!: boolean;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  favorite_cuisines?: string[] = [];
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  least_favorite_cuisines?: string[] = [];
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  cuisines_willing_to_try?: string[] = [];
+}
+
+export class UpdatePreferencesDto {
+  @ApiProperty({ description: 'User theme preference' })
+  @IsString()
+  theme?: string;
+
+  @ApiProperty({ description: 'User language preference' })
+  @IsString()
+  language?: string;
+
+  @ApiProperty({ description: 'Whether notifications are enabled' })
+  @IsBoolean()
+  notifications_enabled?: boolean;
+}
 
 export class CreatePreferenceDto {
   @ApiProperty({

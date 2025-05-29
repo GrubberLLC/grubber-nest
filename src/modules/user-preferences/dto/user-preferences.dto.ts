@@ -2,11 +2,28 @@ import {
   IsArray,
   IsString,
   IsOptional,
-  IsEnum,
   ArrayMinSize,
+  IsBoolean,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserPreferencesDto {
+  @ApiProperty({ description: 'ID of the user' })
+  @IsString()
+  user_id!: string;
+
+  @ApiProperty({ description: 'User theme preference' })
+  @IsString()
+  theme!: string;
+
+  @ApiProperty({ description: 'User language preference' })
+  @IsString()
+  language!: string;
+
+  @ApiProperty({ description: 'Whether notifications are enabled' })
+  @IsBoolean()
+  notifications_enabled!: boolean;
+
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
@@ -97,4 +114,16 @@ export class CreateUserPreferencesDto {
   rating_criteria?: string[] = [];
 }
 
-export class UpdateUserPreferencesDto extends CreateUserPreferencesDto {} 
+export class UpdateUserPreferencesDto {
+  @ApiProperty({ description: 'User theme preference' })
+  @IsString()
+  theme?: string;
+
+  @ApiProperty({ description: 'User language preference' })
+  @IsString()
+  language?: string;
+
+  @ApiProperty({ description: 'Whether notifications are enabled' })
+  @IsBoolean()
+  notifications_enabled?: boolean;
+}

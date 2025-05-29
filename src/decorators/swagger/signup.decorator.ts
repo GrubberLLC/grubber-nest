@@ -94,7 +94,10 @@ export const ApiSignup = () => {
             items: {
               type: 'string',
             },
-            example: ['email must be a valid email address', 'password must be at least 8 characters'],
+            example: [
+              'email must be a valid email address',
+              'password must be at least 8 characters',
+            ],
           },
         },
       },

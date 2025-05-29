@@ -2,164 +2,173 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import {
   CreateNotificationDto,
   UpdateNotificationDto,
-  NotificationType,
-  NotificationStatus,
-} from './dto/notifications.dto';
-import { Pool } from 'pg';
-import { ConfigService } from '@nestjs/config';
+} from './dto/notifications.dto.js';
+import { SupabaseService } from '../../services/supabase/supabase.service.js';
+import {
+  PostgrestSingleResponse,
+  PostgrestResponse,
+} from '@supabase/supabase-js';
 
 export interface Notification {
-  notification_id: number;
-  user_id: number;
-  notification_type: NotificationType;
+  id: number;
+  user_id: string;
+  notification_type: string;
   notification_content: string;
   notification_link?: string;
   is_read: boolean;
-  notification_status: NotificationStatus;
-  notification_date: Date;
+  notification_status: string;
+  notification_date: string;
+  created_at: string;
+  updated_at: string;
 }
 
 @Injectable()
 export class NotificationsService {
-  private pool: Pool;
-
-  constructor(private configService: ConfigService) {
-    this.pool = new Pool({
-      host: this.configService.get<string>('DB_HOST'),
-      port: this.configService.get<number>('DB_PORT'),
-      user: this.configService.get<string>('DB_USERNAME'),
-      password: this.configService.get<string>('DB_PASSWORD'),
-      database: this.configService.get<string>('DB_DATABASE'),
-    });
-  }
+  constructor(private readonly supabaseService: SupabaseService) {}
 
   async create(
-    userId: number,
+    userId: string,
     createNotificationDto: CreateNotificationDto,
   ): Promise<Notification> {
-    const query = `
-      INSERT INTO Notifications (
-        user_id, notification_type, notification_content,
-        notification_link, is_read, notification_status,
-        notification_date
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING *;
-    `;
+    const response = await this.supabaseService.client
+      .from('notifications')
+      .insert({
+        user_id: userId,
+        ...createNotificationDto,
+      })
+      .select()
+      .single();
 
-    const values = [
-      userId,
-      createNotificationDto.notification_type,
-      createNotificationDto.notification_content,
-      createNotificationDto.notification_link,
-      createNotificationDto.is_read,
-      createNotificationDto.notification_status,
-      createNotificationDto.notification_date,
-    ];
+    console.log(response);
 
-    const result = await this.pool.query<Notification>(query, values);
-    return result.rows[0];
+    const { data, error } = response as PostgrestSingleResponse<Notification>;
+
+    if (error) throw error;
+    return data;
   }
 
   async findAll(): Promise<Notification[]> {
-    const query = 'SELECT * FROM Notifications ORDER BY notification_date DESC;';
-    const result = await this.pool.query<Notification>(query);
-    return result.rows;
+    const response = await this.supabaseService.client
+      .from('notifications')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    const { data, error } = response as PostgrestResponse<Notification>;
+
+    console.log(data);
+
+    if (error) throw error;
+    return data;
   }
 
-  async findOne(notificationId: number): Promise<Notification> {
-    const query = 'SELECT * FROM Notifications WHERE notification_id = $1;';
-    const result = await this.pool.query<Notification>(query, [notificationId]);
+  async findOne(id: number): Promise<Notification> {
+    const response = await this.supabaseService.client
+      .from('notifications')
+      .select('*')
+      .eq('id', id)
+      .single();
 
-    if (!result.rows[0]) {
-      throw new NotFoundException(`Notification with ID ${notificationId} not found`);
+    const { data, error } = response as PostgrestSingleResponse<Notification>;
+
+    if (error || !data) {
+      throw new NotFoundException(`Notification with ID ${id} not found`);
     }
 
-    return result.rows[0];
+    return data;
   }
 
-  async findByUserId(userId: number): Promise<Notification[]> {
-    const query = 'SELECT * FROM Notifications WHERE user_id = $1 ORDER BY notification_date DESC;';
-    const result = await this.pool.query<Notification>(query, [userId]);
-    return result.rows;
+  async findByUserId(userId: string): Promise<Notification[]> {
+    const response = await this.supabaseService.client
+      .from('notifications')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    const { data, error } = response as PostgrestResponse<Notification>;
+
+    if (error) throw error;
+    return data;
   }
 
-  async findUnreadByUserId(userId: number): Promise<Notification[]> {
-    const query = 'SELECT * FROM Notifications WHERE user_id = $1 AND is_read = false ORDER BY notification_date DESC;';
-    const result = await this.pool.query<Notification>(query, [userId]);
-    return result.rows;
+  async findUnreadByUserId(userId: string): Promise<Notification[]> {
+    const response = await this.supabaseService.client
+      .from('notifications')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('is_read', false)
+      .order('created_at', { ascending: false });
+
+    const { data, error } = response as PostgrestResponse<Notification>;
+
+    if (error) throw error;
+    return data;
   }
 
   async update(
-    notificationId: number,
+    id: number,
     updateNotificationDto: UpdateNotificationDto,
   ): Promise<Notification> {
-    const query = `
-      UPDATE Notifications
-      SET
-        notification_type = $1,
-        notification_content = $2,
-        notification_link = $3,
-        is_read = $4,
-        notification_status = $5,
-        notification_date = $6
-      WHERE notification_id = $7
-      RETURNING *;
-    `;
+    const response = await this.supabaseService.client
+      .from('notifications')
+      .update(updateNotificationDto)
+      .eq('id', id)
+      .select()
+      .single();
 
-    const values = [
-      updateNotificationDto.notification_type,
-      updateNotificationDto.notification_content,
-      updateNotificationDto.notification_link,
-      updateNotificationDto.is_read,
-      updateNotificationDto.notification_status,
-      updateNotificationDto.notification_date,
-      notificationId,
-    ];
+    const { data, error } = response as PostgrestSingleResponse<Notification>;
 
-    const result = await this.pool.query<Notification>(query, values);
-
-    if (!result.rows[0]) {
-      throw new NotFoundException(`Notification with ID ${notificationId} not found`);
+    if (error || !data) {
+      throw new NotFoundException(`Notification with ID ${id} not found`);
     }
 
-    return result.rows[0];
+    return data;
   }
 
-  async markAsRead(notificationId: number): Promise<Notification> {
-    const query = `
-      UPDATE Notifications
-      SET is_read = true, notification_status = 'Read'
-      WHERE notification_id = $1
-      RETURNING *;
-    `;
+  async markAsRead(id: number): Promise<Notification> {
+    const response = await this.supabaseService.client
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('id', id)
+      .select()
+      .single();
 
-    const result = await this.pool.query<Notification>(query, [notificationId]);
+    const { data, error } = response as PostgrestSingleResponse<Notification>;
 
-    if (!result.rows[0]) {
-      throw new NotFoundException(`Notification with ID ${notificationId} not found`);
+    if (error || !data) {
+      throw new NotFoundException(`Notification with ID ${id} not found`);
     }
 
-    return result.rows[0];
+    return data;
   }
 
-  async markAllAsRead(userId: number): Promise<void> {
-    const query = `
-      UPDATE Notifications
-      SET is_read = true, notification_status = 'Read'
-      WHERE user_id = $1 AND is_read = false;
-    `;
+  async markAllAsRead(userId: string): Promise<Notification[]> {
+    const response = await this.supabaseService.client
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('user_id', userId)
+      .eq('is_read', false)
+      .select();
 
-    await this.pool.query(query, [userId]);
+    const { data, error } = response as PostgrestResponse<Notification>;
+
+    if (error) throw error;
+    return data;
   }
 
-  async remove(notificationId: number): Promise<Notification> {
-    const query = 'DELETE FROM Notifications WHERE notification_id = $1 RETURNING *;';
-    const result = await this.pool.query<Notification>(query, [notificationId]);
+  async remove(id: number): Promise<Notification> {
+    const response = await this.supabaseService.client
+      .from('notifications')
+      .delete()
+      .eq('id', id)
+      .select()
+      .single();
 
-    if (!result.rows[0]) {
-      throw new NotFoundException(`Notification with ID ${notificationId} not found`);
+    const { data, error } = response as PostgrestSingleResponse<Notification>;
+
+    if (error || !data) {
+      throw new NotFoundException(`Notification with ID ${id} not found`);
     }
 
-    return result.rows[0];
+    return data;
   }
-} 
+}

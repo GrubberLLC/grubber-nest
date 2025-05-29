@@ -1,128 +1,127 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
-import { CreateUserFollowDto, UpdateUserFollowDto, FollowStatus, FollowActive } from './dto/user-follows.dto';
-import { Pool } from 'pg';
-import { ConfigService } from '@nestjs/config';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { SupabaseService } from '../../services/supabase/supabase.service.js';
+import {
+  CreateUserFollowDto,
+  UpdateUserFollowDto,
+} from './dto/user-follows.dto.js';
+import {
+  PostgrestSingleResponse,
+  PostgrestResponse,
+} from '@supabase/supabase-js';
 
 export interface UserFollow {
-  follow_id: number;
-  follower_id: number;
-  followed_id: number;
-  follow_status: FollowStatus;
-  follow_active: FollowActive;
-  follow_date: Date;
+  id: number;
+  follower_id: string;
+  followed_id: string;
+  created_at: string;
+  updated_at: string;
 }
 
 @Injectable()
 export class UserFollowsService {
-  private pool: Pool;
+  constructor(private readonly supabaseService: SupabaseService) {}
 
-  constructor(private configService: ConfigService) {
-    this.pool = new Pool({
-      host: this.configService.get<string>('DB_HOST'),
-      port: this.configService.get<number>('DB_PORT'),
-      user: this.configService.get<string>('DB_USERNAME'),
-      password: this.configService.get<string>('DB_PASSWORD'),
-      database: this.configService.get<string>('DB_DATABASE'),
-    });
-  }
+  async create(createUserFollowDto: CreateUserFollowDto): Promise<UserFollow> {
+    const response = await this.supabaseService.client
+      .from('user_follows')
+      .insert(createUserFollowDto)
+      .select()
+      .single();
 
-  async create(
-    followerId: number,
-    createUserFollowDto: CreateUserFollowDto,
-  ): Promise<UserFollow> {
-    // Check if follow relationship already exists
-    const existingFollow = await this.pool.query<UserFollow>(
-      'SELECT * FROM UserFollows WHERE follower_id = $1 AND followed_id = $2',
-      [followerId, createUserFollowDto.followed_id],
-    );
+    const { data, error } = response as PostgrestSingleResponse<UserFollow>;
 
-    if (existingFollow.rows[0]) {
-      throw new ConflictException('Follow relationship already exists');
-    }
-
-    const query = `
-      INSERT INTO UserFollows (
-        follower_id, followed_id, follow_status, follow_active
-      ) VALUES ($1, $2, $3, $4)
-      RETURNING *;
-    `;
-
-    const values = [
-      followerId,
-      createUserFollowDto.followed_id,
-      createUserFollowDto.follow_status,
-      createUserFollowDto.follow_active,
-    ];
-
-    const result = await this.pool.query<UserFollow>(query, values);
-    return result.rows[0];
+    if (error) throw error;
+    return data;
   }
 
   async findAll(): Promise<UserFollow[]> {
-    const query = 'SELECT * FROM UserFollows;';
-    const result = await this.pool.query<UserFollow>(query);
-    return result.rows;
+    const response = await this.supabaseService.client
+      .from('user_follows')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    const { data, error } = response as PostgrestResponse<UserFollow>;
+
+    if (error) throw error;
+    return data;
   }
 
-  async findOne(followId: number): Promise<UserFollow> {
-    const query = 'SELECT * FROM UserFollows WHERE follow_id = $1;';
-    const result = await this.pool.query<UserFollow>(query, [followId]);
+  async findOne(id: number): Promise<UserFollow> {
+    const response = await this.supabaseService.client
+      .from('user_follows')
+      .select('*')
+      .eq('id', id)
+      .single();
 
-    if (!result.rows[0]) {
-      throw new NotFoundException(`Follow relationship with ID ${followId} not found`);
+    const { data, error } = response as PostgrestSingleResponse<UserFollow>;
+
+    if (error || !data) {
+      throw new NotFoundException(`User follow with ID ${id} not found`);
     }
 
-    return result.rows[0];
+    return data;
   }
 
-  async findByFollowerId(followerId: number): Promise<UserFollow[]> {
-    const query = 'SELECT * FROM UserFollows WHERE follower_id = $1;';
-    const result = await this.pool.query<UserFollow>(query, [followerId]);
-    return result.rows;
+  async findByFollowerId(followerId: string): Promise<UserFollow[]> {
+    const response = await this.supabaseService.client
+      .from('user_follows')
+      .select('*')
+      .eq('follower_id', followerId)
+      .order('created_at', { ascending: false });
+
+    const { data, error } = response as PostgrestResponse<UserFollow>;
+
+    if (error) throw error;
+    return data;
   }
 
-  async findByFollowedId(followedId: number): Promise<UserFollow[]> {
-    const query = 'SELECT * FROM UserFollows WHERE followed_id = $1;';
-    const result = await this.pool.query<UserFollow>(query, [followedId]);
-    return result.rows;
+  async findByFollowedId(followedId: string): Promise<UserFollow[]> {
+    const response = await this.supabaseService.client
+      .from('user_follows')
+      .select('*')
+      .eq('followed_id', followedId)
+      .order('created_at', { ascending: false });
+
+    const { data, error } = response as PostgrestResponse<UserFollow>;
+
+    if (error) throw error;
+    return data;
   }
 
   async update(
-    followId: number,
+    id: number,
     updateUserFollowDto: UpdateUserFollowDto,
   ): Promise<UserFollow> {
-    const query = `
-      UPDATE UserFollows
-      SET
-        follow_status = $1,
-        follow_active = $2
-      WHERE follow_id = $3
-      RETURNING *;
-    `;
+    const response = await this.supabaseService.client
+      .from('user_follows')
+      .update(updateUserFollowDto)
+      .eq('id', id)
+      .select()
+      .single();
 
-    const values = [
-      updateUserFollowDto.follow_status,
-      updateUserFollowDto.follow_active,
-      followId,
-    ];
+    const { data, error } = response as PostgrestSingleResponse<UserFollow>;
 
-    const result = await this.pool.query<UserFollow>(query, values);
-
-    if (!result.rows[0]) {
-      throw new NotFoundException(`Follow relationship with ID ${followId} not found`);
+    if (error || !data) {
+      throw new NotFoundException(`User follow with ID ${id} not found`);
     }
 
-    return result.rows[0];
+    return data;
   }
 
-  async remove(followId: number): Promise<UserFollow> {
-    const query = 'DELETE FROM UserFollows WHERE follow_id = $1 RETURNING *;';
-    const result = await this.pool.query<UserFollow>(query, [followId]);
+  async remove(id: number): Promise<UserFollow> {
+    const response = await this.supabaseService.client
+      .from('user_follows')
+      .delete()
+      .eq('id', id)
+      .select()
+      .single();
 
-    if (!result.rows[0]) {
-      throw new NotFoundException(`Follow relationship with ID ${followId} not found`);
+    const { data, error } = response as PostgrestSingleResponse<UserFollow>;
+
+    if (error || !data) {
+      throw new NotFoundException(`User follow with ID ${id} not found`);
     }
 
-    return result.rows[0];
+    return data;
   }
-} 
+}

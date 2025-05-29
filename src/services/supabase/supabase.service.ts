@@ -1,7 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { getErrorMessage } from '../../types/supabase.types.js';
 
 @Injectable()
 export class SupabaseService implements OnModuleInit {
@@ -13,7 +12,9 @@ export class SupabaseService implements OnModuleInit {
   onModuleInit() {
     try {
       const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
-      const supabaseServiceRoleKey = this.configService.get<string>('SUPABASE_SERVICE_ROLE_KEY');
+      const supabaseServiceRoleKey = this.configService.get<string>(
+        'SUPABASE_SERVICE_ROLE_KEY',
+      );
 
       if (!supabaseUrl || !supabaseServiceRoleKey) {
         throw new Error('Missing Supabase configuration');

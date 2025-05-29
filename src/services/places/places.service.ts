@@ -99,7 +99,7 @@ export class PlacesService {
     if (placeIdsToFetch.length === 0) {
       return [];
     }
-    const supabase = this.supabaseService.getClient();
+    const supabase = this.supabaseService.client;
     const { data: placesData, error: fetchError } = await supabase
       .from('Places')
       .select('*')

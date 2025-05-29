@@ -1,7 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service.js';
 import { getErrorMessage } from '../../types/supabase.types.js';
-import { CreateSettingsDto, UpdateSettingsDto } from '../../controllers/settings/dto/settings.dto.js';
+import {
+  CreateSettingsDto,
+  UpdateSettingsDto,
+} from '../../controllers/settings/dto/settings.dto.js';
 
 @Injectable()
 export class SettingsService {
@@ -14,20 +17,23 @@ export class SettingsService {
 
     try {
       const supabase = this.supabaseService.client;
-      
+
       const { data, error } = await supabase
         .from('UserSettings')
-        .insert([{
-          user_id: settingsData.userId,
-          privacy_level: settingsData.privacyLevel || 'Friends',
-          primary_location: settingsData.primaryLocation,
-          willing_to_travel: settingsData.willingToTravel ?? true,
-          preferred_meal_types: settingsData.preferredMealTypes,
-          primary_usage: settingsData.primaryUsage,
-          frequency_of_reviews: settingsData.frequencyOfReviews,
-          receive_notifications: settingsData.receiveNotifications ?? true,
-          newsletter_subscription: settingsData.newsletterSubscription ?? false
-        }])
+        .insert([
+          {
+            user_id: settingsData.userId,
+            privacy_level: settingsData.privacyLevel || 'Friends',
+            primary_location: settingsData.primaryLocation,
+            willing_to_travel: settingsData.willingToTravel ?? true,
+            preferred_meal_types: settingsData.preferredMealTypes,
+            primary_usage: settingsData.primaryUsage,
+            frequency_of_reviews: settingsData.frequencyOfReviews,
+            receive_notifications: settingsData.receiveNotifications ?? true,
+            newsletter_subscription:
+              settingsData.newsletterSubscription ?? false,
+          },
+        ])
         .select()
         .single();
 
@@ -47,7 +53,7 @@ export class SettingsService {
 
     try {
       const supabase = this.supabaseService.client;
-      
+
       const { data, error } = await supabase
         .from('UserSettings')
         .select('*')
@@ -69,7 +75,7 @@ export class SettingsService {
 
     try {
       const supabase = this.supabaseService.client;
-      
+
       const { data, error } = await supabase
         .from('UserSettings')
         .update({
@@ -80,7 +86,7 @@ export class SettingsService {
           primary_usage: settingsData.primaryUsage,
           frequency_of_reviews: settingsData.frequencyOfReviews,
           receive_notifications: settingsData.receiveNotifications,
-          newsletter_subscription: settingsData.newsletterSubscription
+          newsletter_subscription: settingsData.newsletterSubscription,
         })
         .eq('settings_id', settingsData.settingsId)
         .select()
@@ -118,4 +124,4 @@ export class SettingsService {
       throw error;
     }
   }
-} 
+}

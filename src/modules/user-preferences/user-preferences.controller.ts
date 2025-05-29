@@ -9,36 +9,51 @@ import {
   UseGuards,
   ParseIntPipe,
 } from '@nestjs/common';
-import { UserPreferencesService, UserPreferences } from './user-preferences.service';
-import { CreateUserPreferencesDto, UpdateUserPreferencesDto } from './dto/user-preferences.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { GetUser } from '../auth/decorators/get-user.decorator';
+import { UserPreferencesService } from './user-preferences.service.js';
+import {
+  CreateUserPreferencesDto,
+  UpdateUserPreferencesDto,
+} from './dto/user-preferences.dto.js';
+import { JwtAuthGuard } from '../../services/auth/guards/jwt-auth.guard.js';
+import { GetUser } from '../../controllers/auth/decorators/get-user.decorator.js';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('user-preferences')
 @UseGuards(JwtAuthGuard)
 export class UserPreferencesController {
-  constructor(private readonly userPreferencesService: UserPreferencesService) {}
+  constructor(
+    private readonly userPreferencesService: UserPreferencesService,
+  ) {}
 
   @Post()
-  create(
-    @GetUser('id') userId: number,
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Create user preferences' })
+  @ApiResponse({
+    status: 201,
+    description: 'User preferences created successfully',
+  })
+  async create(
+    @GetUser('userId') userId: string,
     @Body() createUserPreferencesDto: CreateUserPreferencesDto,
-  ): Promise<UserPreferences> {
-    return this.userPreferencesService.create(userId, createUserPreferencesDto);
+  ) {
+    return this.userPreferencesService.create({
+      ...createUserPreferencesDto,
+      user_id: userId,
+    });
   }
 
   @Get()
-  findAll(): Promise<UserPreferences[]> {
+  findAll() {
     return this.userPreferencesService.findAll();
   }
 
   @Get('me')
-  findMyPreferences(@GetUser('id') userId: number): Promise<UserPreferences> {
+  findMyPreferences(@GetUser('userId') userId: string) {
     return this.userPreferencesService.findByUserId(userId);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<UserPreferences> {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.userPreferencesService.findOne(id);
   }
 
@@ -46,12 +61,12 @@ export class UserPreferencesController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserPreferencesDto: UpdateUserPreferencesDto,
-  ): Promise<UserPreferences> {
+  ) {
     return this.userPreferencesService.update(id, updateUserPreferencesDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number): Promise<UserPreferences> {
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.userPreferencesService.remove(id);
   }
-} 
+}
