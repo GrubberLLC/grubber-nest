@@ -5,13 +5,10 @@ import {
 } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service.js';
 import {
-  CreateUserPreferencesDto,
-  UpdateUserPreferencesDto,
+  CreatePreferencesDto,
+  UpdatePreferencesDto,
 } from '../../controllers/preferences/dto/preferences.dto.js';
-import {
-  PostgrestSingleResponse,
-  PostgrestResponse,
-} from '@supabase/supabase-js';
+import { PostgrestResponse } from '@supabase/supabase-js';
 
 export interface UserPreferences {
   id: string;
@@ -30,47 +27,44 @@ export class PreferencesService {
   constructor(private readonly supabaseService: SupabaseService) {}
 
   async create(
-    createUserPreferencesDto: CreateUserPreferencesDto,
+    createUserPreferencesDto: CreatePreferencesDto,
   ): Promise<UserPreferences> {
-    const response: PostgrestSingleResponse<UserPreferences> =
-      await this.supabaseService.client
-        .from('user_preferences')
-        .insert([createUserPreferencesDto])
-        .select()
-        .single();
+    const response = await this.supabaseService.client
+      .from('user_preferences')
+      .insert([createUserPreferencesDto])
+      .select()
+      .single();
     if (response.error || !response.data) {
       throw new InternalServerErrorException(
         response.error?.message || 'Failed to create preferences',
       );
     }
-    return response.data;
+    return response.data as UserPreferences;
   }
 
   async update(
     id: string,
-    updateUserPreferencesDto: UpdateUserPreferencesDto,
+    updateUserPreferencesDto: UpdatePreferencesDto,
   ): Promise<UserPreferences> {
-    const response: PostgrestSingleResponse<UserPreferences> =
-      await this.supabaseService.client
-        .from('user_preferences')
-        .update(updateUserPreferencesDto)
-        .eq('id', id)
-        .select()
-        .single();
+    const response = await this.supabaseService.client
+      .from('user_preferences')
+      .update(updateUserPreferencesDto)
+      .eq('id', id)
+      .select()
+      .single();
     if (response.error || !response.data) {
       throw new NotFoundException(
         response.error?.message || 'Preferences not found',
       );
     }
-    return response.data;
+    return response.data as UserPreferences;
   }
 
   async findAll(userId: string): Promise<UserPreferences[]> {
-    const response: PostgrestResponse<UserPreferences> =
-      await this.supabaseService.client
-        .from('user_preferences')
-        .select('*')
-        .eq('user_id', userId);
+    const response = (await this.supabaseService.client
+      .from('user_preferences')
+      .select('*')
+      .eq('user_id', userId)) as PostgrestResponse<UserPreferences>;
     if (response.error) {
       throw new InternalServerErrorException(response.error.message);
     }
@@ -78,25 +72,24 @@ export class PreferencesService {
   }
 
   async findOne(id: string): Promise<UserPreferences> {
-    const response: PostgrestSingleResponse<UserPreferences> =
-      await this.supabaseService.client
-        .from('user_preferences')
-        .select('*')
-        .eq('id', id)
-        .single();
+    const response = await this.supabaseService.client
+      .from('user_preferences')
+      .select('*')
+      .eq('id', id)
+      .single();
     if (response.error || !response.data) {
       throw new NotFoundException(
         response.error?.message || 'Preferences not found',
       );
     }
-    return response.data;
+    return response.data as UserPreferences;
   }
 
   async remove(id: string): Promise<{ message: string }> {
-    const response = await this.supabaseService.client
+    const response = (await this.supabaseService.client
       .from('user_preferences')
       .delete()
-      .eq('id', id);
+      .eq('id', id)) as PostgrestResponse<null>;
     if (response.error) {
       throw new NotFoundException(response.error.message);
     }

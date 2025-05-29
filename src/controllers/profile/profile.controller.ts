@@ -47,7 +47,11 @@ export class ProfileController {
     @Body() createProfileDto: CreateProfileDto,
   ): Promise<CreateProfileDto> {
     try {
-      const result = await this.profileService.createProfile(createProfileDto);
+      const result = await (
+        this.profileService.createProfile as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(createProfileDto);
       if (!result) {
         throw new Error('Failed to create profile');
       }
@@ -86,7 +90,11 @@ export class ProfileController {
   })
   async getProfile(@Body('userId') userId: string): Promise<CreateProfileDto> {
     try {
-      const result = await this.profileService.getProfile(userId);
+      const result = await (
+        this.profileService.getProfile as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(userId);
       if (!result) {
         throw new Error('Failed to get profile');
       }
@@ -128,7 +136,11 @@ export class ProfileController {
     @Body() updateProfileDto: UpdateProfileDto,
   ): Promise<UpdateProfileDto> {
     try {
-      const result = await this.profileService.updateProfile(updateProfileDto);
+      const result = await (
+        this.profileService.updateProfile as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(updateProfileDto);
       if (!result) {
         throw new Error('Failed to update profile');
       }

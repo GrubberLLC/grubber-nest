@@ -49,8 +49,11 @@ export class PreferencesController {
     @Body() createPreferenceDto: CreatePreferenceDto,
   ): Promise<CreatePreferenceDto> {
     try {
-      const result: CreatePreferenceDto | null =
-        await this.preferencesService.create(createPreferenceDto);
+      const result = (await (
+        this.preferencesService.create as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(createPreferenceDto)) as CreatePreferenceDto | null;
       if (!result) {
         throw new Error('Failed to create preference');
       }
@@ -91,8 +94,11 @@ export class PreferencesController {
     @Body('userId') userId: string,
   ): Promise<CreatePreferenceDto[]> {
     try {
-      const result: CreatePreferenceDto[] =
-        await this.preferencesService.findAll(userId);
+      const result = (await (
+        this.preferencesService.findAll as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(userId)) as CreatePreferenceDto[];
       return result;
     } catch (error: unknown) {
       const errorMessage =
@@ -131,11 +137,14 @@ export class PreferencesController {
     @Body() updatePreferenceDto: UpdatePreferenceDto,
   ): Promise<UpdatePreferenceDto> {
     try {
-      const result: UpdatePreferenceDto | null =
-        await this.preferencesService.update(
-          updatePreferenceDto.preferenceId,
-          updatePreferenceDto,
-        );
+      const result = (await (
+        this.preferencesService.update as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(
+        updatePreferenceDto.preferenceId,
+        updatePreferenceDto,
+      )) as UpdatePreferenceDto | null;
       if (!result) {
         throw new Error('Failed to update preference');
       }
@@ -185,8 +194,11 @@ export class PreferencesController {
     @Body('preferenceId') preferenceId: string,
   ): Promise<DeleteResponse> {
     try {
-      const result: DeleteResponse | null =
-        await this.preferencesService.remove(preferenceId);
+      const result = (await (
+        this.preferencesService.remove as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(preferenceId)) as DeleteResponse | null;
       if (!result) {
         throw new Error('Failed to delete preference');
       }

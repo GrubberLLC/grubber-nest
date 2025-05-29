@@ -54,7 +54,11 @@ export class SettingsController {
     @Body() createSettingsDto: CreateSettingsDto,
   ): Promise<CreateSettingsDto> {
     try {
-      return await this.settingsService.createSettings(createSettingsDto);
+      return (await (
+        this.settingsService.createSettings as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(createSettingsDto)) as CreateSettingsDto;
     } catch (error) {
       throw new HttpException(
         {
@@ -90,7 +94,11 @@ export class SettingsController {
     @Body() getSettingsDto: GetSettingsDto,
   ): Promise<CreateSettingsDto[]> {
     try {
-      return await this.settingsService.getSettings(getSettingsDto.userId);
+      return (await (
+        this.settingsService.getSettings as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(getSettingsDto.userId)) as CreateSettingsDto[];
     } catch (error) {
       throw new HttpException(
         {
@@ -126,7 +134,11 @@ export class SettingsController {
     @Body() updateSettingsDto: UpdateSettingsDto,
   ): Promise<UpdateSettingsDto> {
     try {
-      return await this.settingsService.updateSettings(updateSettingsDto);
+      return (await (
+        this.settingsService.updateSettings as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(updateSettingsDto)) as UpdateSettingsDto;
     } catch (error) {
       throw new HttpException(
         {
@@ -167,7 +179,11 @@ export class SettingsController {
     @Body() deleteSettingsDto: DeleteSettingsDto,
   ): Promise<DeleteResponse> {
     try {
-      return await this.settingsService.deleteSettings(deleteSettingsDto.id);
+      return (await (
+        this.settingsService.deleteSettings as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(deleteSettingsDto.settingsId)) as DeleteResponse;
     } catch (error) {
       throw new HttpException(
         {

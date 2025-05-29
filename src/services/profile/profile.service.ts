@@ -5,6 +5,26 @@ import {
   CreateProfileDto,
   UpdateProfileDto,
 } from '../../controllers/profile/dto/profile.dto.js';
+import { PostgrestResponse, PostgrestError } from '@supabase/supabase-js';
+
+// Define the Profile interface based on database schema
+interface Profile {
+  id: string;
+  user_id: string;
+  username?: string | null;
+  email?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  bio?: string | null;
+  phone?: string | null;
+  verified?: boolean;
+  public?: boolean;
+  profile_picture?: string | null;
+  fcm_token?: string | null;
+  account_name?: string | null;
+  show_tutorial?: boolean;
+  testing?: boolean;
+}
 
 @Injectable()
 export class ProfileService {
@@ -12,13 +32,16 @@ export class ProfileService {
 
   constructor(private readonly supabaseService: SupabaseService) {}
 
-  async createProfile(profileData: CreateProfileDto) {
+  async createProfile(profileData: CreateProfileDto): Promise<Profile | null> {
     this.logger.log(`Creating profile for user: ${profileData.userId}`);
 
     try {
       const supabase = this.supabaseService.client;
 
-      const { data, error } = await supabase
+      const {
+        data,
+        error,
+      }: { data: Profile | null; error: PostgrestError | null } = await supabase
         .from('Profile')
         .insert([
           {
@@ -52,13 +75,16 @@ export class ProfileService {
     }
   }
 
-  async getProfile(userId: string) {
+  async getProfile(userId: string): Promise<Profile | null> {
     this.logger.log(`Getting profile for user: ${userId}`);
 
     try {
       const supabase = this.supabaseService.client;
 
-      const { data, error } = await supabase
+      const {
+        data,
+        error,
+      }: { data: Profile | null; error: PostgrestError | null } = await supabase
         .from('Profile')
         .select('*')
         .eq('user_id', userId)
@@ -75,13 +101,16 @@ export class ProfileService {
     }
   }
 
-  async updateProfile(profileData: UpdateProfileDto) {
+  async updateProfile(profileData: UpdateProfileDto): Promise<Profile | null> {
     this.logger.log(`Updating profile: ${profileData.id}`);
 
     try {
       const supabase = this.supabaseService.client;
 
-      const { data, error } = await supabase
+      const {
+        data,
+        error,
+      }: { data: Profile | null; error: PostgrestError | null } = await supabase
         .from('Profile')
         .update({
           username: profileData.username,
@@ -113,16 +142,16 @@ export class ProfileService {
     }
   }
 
-  async deleteProfile(profileId: string) {
+  async deleteProfile(profileId: string): Promise<{ message: string }> {
     this.logger.log(`Deleting profile: ${profileId}`);
 
     try {
       const supabase = this.supabaseService.client;
 
-      const { error } = await supabase
+      const { error } = (await supabase
         .from('Profile')
         .delete()
-        .eq('id', profileId);
+        .eq('id', profileId)) as PostgrestResponse<null>; // Ensuring delete response is typed
 
       if (error) {
         throw new Error(`Failed to delete profile: ${error.message}`);

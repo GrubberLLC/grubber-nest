@@ -49,8 +49,11 @@ export class NotificationsController {
     @Body() createNotificationDto: CreateNotificationDto,
   ): Promise<CreateNotificationDto> {
     try {
-      const result: CreateNotificationDto | null =
-        await this.notificationsService.create(createNotificationDto);
+      const result = (await (
+        this.notificationsService.create as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(createNotificationDto)) as CreateNotificationDto | null;
       if (!result) {
         throw new Error('Failed to create notification');
       }
@@ -91,8 +94,11 @@ export class NotificationsController {
     @Body('userId') userId: string,
   ): Promise<CreateNotificationDto[]> {
     try {
-      const result: CreateNotificationDto[] =
-        await this.notificationsService.findAll(userId);
+      const result = (await (
+        this.notificationsService.findAll as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(userId)) as CreateNotificationDto[];
       return result;
     } catch (error: unknown) {
       const errorMessage =
@@ -131,11 +137,14 @@ export class NotificationsController {
     @Body() updateNotificationDto: UpdateNotificationDto,
   ): Promise<UpdateNotificationDto> {
     try {
-      const result: UpdateNotificationDto | null =
-        await this.notificationsService.update(
-          updateNotificationDto.notificationId,
-          updateNotificationDto,
-        );
+      const result = (await (
+        this.notificationsService.update as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(
+        updateNotificationDto.notificationId,
+        updateNotificationDto,
+      )) as UpdateNotificationDto | null;
       if (!result) {
         throw new Error('Failed to update notification');
       }
@@ -185,8 +194,11 @@ export class NotificationsController {
     @Body('notificationId') notificationId: string,
   ): Promise<DeleteResponse> {
     try {
-      const result: DeleteResponse | null =
-        await this.notificationsService.remove(notificationId);
+      const result = (await (
+        this.notificationsService.remove as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(notificationId)) as DeleteResponse | null;
       if (!result) {
         throw new Error('Failed to delete notification');
       }
