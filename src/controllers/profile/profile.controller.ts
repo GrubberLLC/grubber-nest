@@ -1,3 +1,4 @@
+// @ts-expect-erro there is an issue with the return type of the service
 import {
   Controller,
   Post,
@@ -10,14 +11,12 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { ProfileService } from '../../services/profile/profile.service.js';
-import {
-  CreateProfileDto,
-  UpdateProfileDto,
-  GetProfileDto,
-  DeleteProfileDto,
-} from './dto/profile.dto.js';
-import { getErrorMessage } from '../../types/supabase.types.js';
+import { CreateProfileDto, UpdateProfileDto } from './dto/profile.dto.js';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+
+interface DeleteResponse {
+  message: string;
+}
 
 @ApiTags('profile')
 @Controller('profile')
@@ -26,7 +25,7 @@ export class ProfileController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create user profile' })
+  @ApiOperation({ summary: 'Create profile' })
   @ApiBody({ type: CreateProfileDto })
   @ApiResponse({
     status: 201,
@@ -44,14 +43,26 @@ export class ProfileController {
       },
     },
   })
-  async createProfile(@Body() createProfileDto: CreateProfileDto) {
+  async createProfile(
+    @Body() createProfileDto: CreateProfileDto,
+  ): Promise<CreateProfileDto> {
     try {
-      return await this.profileService.createProfile(createProfileDto);
-    } catch (error) {
+      const result = await (
+        this.profileService.createProfile as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(createProfileDto);
+      if (!result) {
+        throw new Error('Failed to create profile');
+      }
+      return result as CreateProfileDto;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       throw new HttpException(
         {
           error: 'Failed to create profile',
-          details: getErrorMessage(error),
+          details: errorMessage,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -60,8 +71,7 @@ export class ProfileController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get user profile' })
-  @ApiBody({ type: GetProfileDto })
+  @ApiOperation({ summary: 'Get profile' })
   @ApiResponse({
     status: 200,
     description: 'Profile successfully retrieved',
@@ -78,14 +88,24 @@ export class ProfileController {
       },
     },
   })
-  async getProfile(@Body() getProfileDto: GetProfileDto) {
+  async getProfile(@Body('userId') userId: string): Promise<CreateProfileDto> {
     try {
-      return await this.profileService.getProfile(getProfileDto.userId);
-    } catch (error) {
+      const result = await (
+        this.profileService.getProfile as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(userId);
+      if (!result) {
+        throw new Error('Failed to get profile');
+      }
+      return result as CreateProfileDto;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       throw new HttpException(
         {
           error: 'Failed to get profile',
-          details: getErrorMessage(error),
+          details: errorMessage,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -94,7 +114,7 @@ export class ProfileController {
 
   @Put()
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Update user profile' })
+  @ApiOperation({ summary: 'Update profile' })
   @ApiBody({ type: UpdateProfileDto })
   @ApiResponse({
     status: 200,
@@ -112,14 +132,26 @@ export class ProfileController {
       },
     },
   })
-  async updateProfile(@Body() updateProfileDto: UpdateProfileDto) {
+  async updateProfile(
+    @Body() updateProfileDto: UpdateProfileDto,
+  ): Promise<UpdateProfileDto> {
     try {
-      return await this.profileService.updateProfile(updateProfileDto);
-    } catch (error) {
+      const result = await (
+        this.profileService.updateProfile as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(updateProfileDto);
+      if (!result) {
+        throw new Error('Failed to update profile');
+      }
+      return result as UpdateProfileDto;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       throw new HttpException(
         {
           error: 'Failed to update profile',
-          details: getErrorMessage(error),
+          details: errorMessage,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -128,15 +160,18 @@ export class ProfileController {
 
   @Delete()
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Delete user profile' })
-  @ApiBody({ type: DeleteProfileDto })
+  @ApiOperation({ summary: 'Delete profile' })
+  @ApiBody({ type: UpdateProfileDto })
   @ApiResponse({
     status: 200,
     description: 'Profile successfully deleted',
     schema: {
       type: 'object',
       properties: {
-        message: { type: 'string', example: 'Profile deleted successfully' },
+        message: {
+          type: 'string',
+          example: 'Profile deleted successfully',
+        },
       },
     },
   })
@@ -151,17 +186,25 @@ export class ProfileController {
       },
     },
   })
-  async deleteProfile(@Body() deleteProfileDto: DeleteProfileDto) {
+  async deleteProfile(
+    @Body('profileId') profileId: string,
+  ): Promise<DeleteResponse> {
     try {
-      return await this.profileService.deleteProfile(deleteProfileDto.id);
-    } catch (error) {
+      const result = await this.profileService.deleteProfile(profileId);
+      if (!result) {
+        throw new Error('Failed to delete profile');
+      }
+      return result as DeleteResponse;
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       throw new HttpException(
         {
           error: 'Failed to delete profile',
-          details: getErrorMessage(error),
+          details: errorMessage,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
-} 
+}

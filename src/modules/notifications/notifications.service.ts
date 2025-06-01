@@ -53,6 +53,8 @@ export class NotificationsService {
 
     const { data, error } = response as PostgrestResponse<Notification>;
 
+    console.log(data);
+
     if (error) throw error;
     return data;
   }

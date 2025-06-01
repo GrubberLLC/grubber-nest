@@ -22,4 +22,4 @@ import { HealthModule } from './modules/health/health.module.js';
   ],
   providers: [SupabaseService],
 })
-export class AppModule {} 
+export class AppModule {}

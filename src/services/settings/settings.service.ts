@@ -1,7 +1,24 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service.js';
 import { getErrorMessage } from '../../types/supabase.types.js';
-import { CreateSettingsDto, UpdateSettingsDto } from '../../controllers/settings/dto/settings.dto.js';
+import {
+  CreateSettingsDto,
+  UpdateSettingsDto,
+} from '../../controllers/settings/dto/settings.dto.js';
+import { PostgrestResponse, PostgrestError } from '@supabase/supabase-js';
+
+interface UserSettings {
+  settings_id: string;
+  user_id: string;
+  privacy_level?: string | null;
+  primary_location?: string | null;
+  willing_to_travel?: boolean | null;
+  preferred_meal_types?: string[] | null;
+  primary_usage?: string | null;
+  frequency_of_reviews?: string | null;
+  receive_notifications?: boolean | null;
+  newsletter_subscription?: boolean | null;
+}
 
 @Injectable()
 export class SettingsService {
@@ -9,27 +26,36 @@ export class SettingsService {
 
   constructor(private readonly supabaseService: SupabaseService) {}
 
-  async createSettings(settingsData: CreateSettingsDto) {
+  async createSettings(
+    settingsData: CreateSettingsDto,
+  ): Promise<UserSettings | null> {
     this.logger.log(`Creating settings for user: ${settingsData.userId}`);
 
     try {
       const supabase = this.supabaseService.client;
-      
-      const { data, error } = await supabase
-        .from('UserSettings')
-        .insert([{
-          user_id: settingsData.userId,
-          privacy_level: settingsData.privacyLevel || 'Friends',
-          primary_location: settingsData.primaryLocation,
-          willing_to_travel: settingsData.willingToTravel ?? true,
-          preferred_meal_types: settingsData.preferredMealTypes,
-          primary_usage: settingsData.primaryUsage,
-          frequency_of_reviews: settingsData.frequencyOfReviews,
-          receive_notifications: settingsData.receiveNotifications ?? true,
-          newsletter_subscription: settingsData.newsletterSubscription ?? false
-        }])
-        .select()
-        .single();
+
+      const {
+        data,
+        error,
+      }: { data: UserSettings | null; error: PostgrestError | null } =
+        await supabase
+          .from('UserSettings')
+          .insert([
+            {
+              user_id: settingsData.userId,
+              privacy_level: settingsData.privacyLevel || 'Friends',
+              primary_location: settingsData.primaryLocation,
+              willing_to_travel: settingsData.willingToTravel ?? true,
+              preferred_meal_types: settingsData.preferredMealTypes,
+              primary_usage: settingsData.primaryUsage,
+              frequency_of_reviews: settingsData.frequencyOfReviews,
+              receive_notifications: settingsData.receiveNotifications ?? true,
+              newsletter_subscription:
+                settingsData.newsletterSubscription ?? false,
+            },
+          ])
+          .select()
+          .single();
 
       if (error) {
         throw new Error(`Failed to create settings: ${error.message}`);
@@ -42,16 +68,17 @@ export class SettingsService {
     }
   }
 
-  async getSettings(userId: string) {
+  async getSettings(userId: string): Promise<UserSettings[] | null> {
     this.logger.log(`Getting settings for user: ${userId}`);
 
     try {
       const supabase = this.supabaseService.client;
-      
-      const { data, error } = await supabase
-        .from('UserSettings')
-        .select('*')
-        .eq('user_id', userId);
+
+      const {
+        data,
+        error,
+      }: { data: UserSettings[] | null; error: PostgrestError | null } =
+        await supabase.from('UserSettings').select('*').eq('user_id', userId);
 
       if (error) {
         throw new Error(`Failed to get settings: ${error.message}`);
@@ -64,27 +91,33 @@ export class SettingsService {
     }
   }
 
-  async updateSettings(settingsData: UpdateSettingsDto) {
+  async updateSettings(
+    settingsData: UpdateSettingsDto,
+  ): Promise<UserSettings | null> {
     this.logger.log(`Updating settings: ${settingsData.settingsId}`);
 
     try {
       const supabase = this.supabaseService.client;
-      
-      const { data, error } = await supabase
-        .from('UserSettings')
-        .update({
-          privacy_level: settingsData.privacyLevel,
-          primary_location: settingsData.primaryLocation,
-          willing_to_travel: settingsData.willingToTravel,
-          preferred_meal_types: settingsData.preferredMealTypes,
-          primary_usage: settingsData.primaryUsage,
-          frequency_of_reviews: settingsData.frequencyOfReviews,
-          receive_notifications: settingsData.receiveNotifications,
-          newsletter_subscription: settingsData.newsletterSubscription
-        })
-        .eq('settings_id', settingsData.settingsId)
-        .select()
-        .single();
+
+      const {
+        data,
+        error,
+      }: { data: UserSettings | null; error: PostgrestError | null } =
+        await supabase
+          .from('UserSettings')
+          .update({
+            privacy_level: settingsData.privacyLevel,
+            primary_location: settingsData.primaryLocation,
+            willing_to_travel: settingsData.willingToTravel,
+            preferred_meal_types: settingsData.preferredMealTypes,
+            primary_usage: settingsData.primaryUsage,
+            frequency_of_reviews: settingsData.frequencyOfReviews,
+            receive_notifications: settingsData.receiveNotifications,
+            newsletter_subscription: settingsData.newsletterSubscription,
+          })
+          .eq('settings_id', settingsData.settingsId)
+          .select()
+          .single();
 
       if (error) {
         throw new Error(`Failed to update settings: ${error.message}`);
@@ -97,16 +130,16 @@ export class SettingsService {
     }
   }
 
-  async deleteSettings(settingsId: string) {
+  async deleteSettings(settingsId: string): Promise<{ message: string }> {
     this.logger.log(`Deleting settings: ${settingsId}`);
 
     try {
       const supabase = this.supabaseService.client;
 
-      const { error } = await supabase
+      const { error } = (await supabase
         .from('UserSettings')
         .delete()
-        .eq('settings_id', settingsId);
+        .eq('settings_id', settingsId)) as PostgrestResponse<null>;
 
       if (error) {
         throw new Error(`Failed to delete settings: ${error.message}`);
@@ -118,4 +151,4 @@ export class SettingsService {
       throw error;
     }
   }
-} 
+}

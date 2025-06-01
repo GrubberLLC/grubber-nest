@@ -9,4 +9,4 @@ import { SupabaseService } from '../../services/supabase/supabase.service.js';
   providers: [SettingsService, SupabaseService],
   exports: [SettingsService],
 })
-export class SettingsModule {} 
+export class SettingsModule {}

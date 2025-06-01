@@ -18,7 +18,14 @@ export const ApiCreatePreference = () => {
             type: 'array',
             items: {
               type: 'string',
-              enum: ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'halal', 'kosher'],
+              enum: [
+                'vegetarian',
+                'vegan',
+                'gluten-free',
+                'dairy-free',
+                'halal',
+                'kosher',
+              ],
             },
             example: ['vegetarian', 'gluten-free'],
             description: 'User dietary restrictions',
@@ -206,7 +213,14 @@ export const ApiUpdatePreference = () => {
             type: 'array',
             items: {
               type: 'string',
-              enum: ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'halal', 'kosher'],
+              enum: [
+                'vegetarian',
+                'vegan',
+                'gluten-free',
+                'dairy-free',
+                'halal',
+                'kosher',
+              ],
             },
             example: ['vegetarian', 'gluten-free'],
             description: 'User dietary restrictions',

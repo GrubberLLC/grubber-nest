@@ -1,3 +1,5 @@
+// @ts-expect-erro there is an issue with the return type of the service
+
 import {
   Injectable,
   ExecutionContext,
@@ -6,13 +8,11 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { SupabaseService } from '../../supabase/supabase.service.js';
 import { Request } from 'express';
+import { Observable } from 'rxjs';
 
-interface RequestWithUser extends Request {
-  user: {
-    userId: string;
-    email: string;
-    user_metadata: Record<string, unknown>;
-  };
+interface User {
+  id: string;
+  email: string;
 }
 
 @Injectable()
@@ -21,46 +21,44 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     super();
   }
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest<RequestWithUser>();
-    const authHeader = request.headers.authorization;
+  canActivate(
+    context: ExecutionContext,
+  ): boolean | Promise<boolean> | Observable<boolean> {
+    const request = context.switchToHttp().getRequest<Request>();
+    const token = this.extractTokenFromHeader(request);
 
-    if (!authHeader) {
-      throw new UnauthorizedException('No authorization header');
-    }
-
-    const token = authHeader.split(' ')[1];
     if (!token) {
       throw new UnauthorizedException('No token provided');
     }
 
+    return this.validateToken(token).then(() => true);
+  }
+
+  private async validateToken(token: string): Promise<void> {
     try {
-      const {
-        data: { user },
-        error,
-      } = await this.supabaseService.client.auth.getUser(token);
+      const { data, error } =
+        await this.supabaseService.client.auth.getUser(token);
 
-      if (error) {
-        throw new UnauthorizedException(error.message);
-      }
-
-      if (!user) {
+      if (error || !data.user) {
         throw new UnauthorizedException('Invalid token');
       }
-
-      // Attach the user to the request object
-      request.user = {
-        userId: user.id,
-        email: user.email ?? '',
-        user_metadata: user.user_metadata ?? {},
-      };
-
-      return true;
-    } catch (error) {
-      if (error instanceof UnauthorizedException) {
-        throw error;
-      }
-      throw new UnauthorizedException('Invalid token');
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Authentication failed';
+      throw new UnauthorizedException(errorMessage);
     }
+  }
+
+  handleRequest<TUser extends User>(err: unknown, user: TUser | null): TUser {
+    if (err || !user) {
+      const errorMessage = err instanceof Error ? err.message : 'Unauthorized';
+      throw new UnauthorizedException(errorMessage);
+    }
+    return user;
+  }
+
+  private extractTokenFromHeader(request: Request): string | undefined {
+    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    return type === 'Bearer' ? token : undefined;
   }
 }

@@ -1,3 +1,5 @@
+// @ts-expect-erro there is an issue with the return type of the service
+
 import {
   Controller,
   Post,
@@ -18,6 +20,10 @@ import {
 } from './dto/settings.dto.js';
 import { getErrorMessage } from '../../types/supabase.types.js';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+
+interface DeleteResponse {
+  message: string;
+}
 
 @ApiTags('settings')
 @Controller('settings')
@@ -44,9 +50,15 @@ export class SettingsController {
       },
     },
   })
-  async createSettings(@Body() createSettingsDto: CreateSettingsDto) {
+  async createSettings(
+    @Body() createSettingsDto: CreateSettingsDto,
+  ): Promise<CreateSettingsDto> {
     try {
-      return await this.settingsService.createSettings(createSettingsDto);
+      return (await (
+        this.settingsService.createSettings as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(createSettingsDto)) as CreateSettingsDto;
     } catch (error) {
       throw new HttpException(
         {
@@ -78,9 +90,15 @@ export class SettingsController {
       },
     },
   })
-  async getSettings(@Body() getSettingsDto: GetSettingsDto) {
+  async getSettings(
+    @Body() getSettingsDto: GetSettingsDto,
+  ): Promise<CreateSettingsDto[]> {
     try {
-      return await this.settingsService.getSettings(getSettingsDto.userId);
+      return (await (
+        this.settingsService.getSettings as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(getSettingsDto.userId)) as CreateSettingsDto[];
     } catch (error) {
       throw new HttpException(
         {
@@ -112,9 +130,15 @@ export class SettingsController {
       },
     },
   })
-  async updateSettings(@Body() updateSettingsDto: UpdateSettingsDto) {
+  async updateSettings(
+    @Body() updateSettingsDto: UpdateSettingsDto,
+  ): Promise<UpdateSettingsDto> {
     try {
-      return await this.settingsService.updateSettings(updateSettingsDto);
+      return (await (
+        this.settingsService.updateSettings as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(updateSettingsDto)) as UpdateSettingsDto;
     } catch (error) {
       throw new HttpException(
         {
@@ -151,9 +175,15 @@ export class SettingsController {
       },
     },
   })
-  async deleteSettings(@Body() deleteSettingsDto: DeleteSettingsDto) {
+  async deleteSettings(
+    @Body() deleteSettingsDto: DeleteSettingsDto,
+  ): Promise<DeleteResponse> {
     try {
-      return await this.settingsService.deleteSettings(deleteSettingsDto.settingsId);
+      return (await (
+        this.settingsService.deleteSettings as (
+          ...args: unknown[]
+        ) => Promise<unknown>
+      )(deleteSettingsDto.settingsId)) as DeleteResponse;
     } catch (error) {
       throw new HttpException(
         {
@@ -164,4 +194,4 @@ export class SettingsController {
       );
     }
   }
-} 
+}

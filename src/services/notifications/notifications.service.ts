@@ -1,91 +1,113 @@
-import { Injectable } from '@nestjs/common';
-import { CreateNotificationDto, UpdateNotificationDto } from '../../controllers/notifications/dto/notifications.dto.js';
+import {
+  Injectable,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import {
+  CreateNotificationDto,
+  UpdateNotificationDto,
+} from '../../controllers/notifications/dto/notifications.dto.js';
 import { SupabaseService } from '../supabase/supabase.service.js';
+import {
+  PostgrestSingleResponse,
+  PostgrestResponse,
+} from '@supabase/supabase-js';
 
+export interface Notification {
+  id: string;
+  user_id: string;
+  notification_type: string;
+  notification_content: string;
+  notification_link?: string;
+  is_read: boolean;
+  notification_status: string;
+  notification_date: string;
+}
 
 @Injectable()
 export class NotificationsService {
   constructor(private readonly supabaseService: SupabaseService) {}
 
-  async createNotification(notificationData: CreateNotificationDto) {
-    try {
-      const supabase = this.supabaseService.client;
-      const { data, error } = await supabase
-        .from('Notifications')
-        .insert([
-          {
-            user_id: notificationData.userId,
-            new_followers: notificationData.newFollowers ?? true,
-            likes_and_comments: notificationData.likesAndComments ?? true,
-            recommendations: notificationData.recommendations ?? true,
-            trending_spots: notificationData.trendingSpots ?? true,
-          },
-        ])
+  async create(
+    createNotificationDto: CreateNotificationDto,
+  ): Promise<Notification> {
+    const response: PostgrestSingleResponse<Notification> =
+      await this.supabaseService.client
+        .from('notifications')
+        .insert([createNotificationDto])
         .select()
         .single();
-
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      console.error('Error creating notification settings:', error);
-      throw error;
+    if (response.error || !response.data) {
+      throw new InternalServerErrorException(
+        response.error?.message || 'Failed to create notification',
+      );
     }
+    return response.data;
   }
 
-  async getNotifications(userId: string) {
-    try {
-      const supabase = this.supabaseService.client;
-      const { data, error } = await supabase
-        .from('Notifications')
+  async findAll(userId: string): Promise<Notification[]> {
+    const response: PostgrestResponse<Notification> =
+      await this.supabaseService.client
+        .from('notifications')
+        .select('*')
+        .eq('user_id', userId);
+    if (response.error) {
+      throw new InternalServerErrorException(response.error.message);
+    }
+    return response.data || [];
+  }
+
+  async findUnread(userId: string): Promise<Notification[]> {
+    const response: PostgrestResponse<Notification> =
+      await this.supabaseService.client
+        .from('notifications')
         .select('*')
         .eq('user_id', userId)
-        .single();
-
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      console.error('Error getting notification settings:', error);
-      throw error;
+        .eq('is_read', false);
+    if (response.error) {
+      throw new InternalServerErrorException(response.error.message);
     }
+    return response.data || [];
   }
 
-  async updateNotification(notificationData: UpdateNotificationDto) {
-    try {
-      const supabase = this.supabaseService.client;
-      const { data, error } = await supabase
-        .from('Notifications')
-        .update({
-          user_id: notificationData.userId,
-          new_followers: notificationData.newFollowers,
-          likes_and_comments: notificationData.likesAndComments,
-          recommendations: notificationData.recommendations,
-          trending_spots: notificationData.trendingSpots,
-        })
-        .eq('notification_id', notificationData.notificationId)
+  async markAllAsRead(userId: string): Promise<{ message: string }> {
+    const response = await this.supabaseService.client
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('user_id', userId);
+    if (response.error) {
+      throw new InternalServerErrorException(response.error.message);
+    }
+    return { message: 'All notifications marked as read' };
+  }
+
+  async update(
+    id: string,
+    updateNotificationDto: UpdateNotificationDto,
+  ): Promise<Notification> {
+    const response: PostgrestSingleResponse<Notification> =
+      await this.supabaseService.client
+        .from('notifications')
+        .update(updateNotificationDto)
+        .eq('id', id)
         .select()
         .single();
-
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      console.error('Error updating notification settings:', error);
-      throw error;
+    if (response.error || !response.data) {
+      throw new NotFoundException(
+        response.error?.message || 'Notification not found',
+      );
     }
+    return response.data;
   }
 
-  async deleteNotification(notificationId: string) {
-    try {
-      const supabase = this.supabaseService.client;
-      const { error } = await supabase
-        .from('Notifications')
-        .delete()
-        .eq('notification_id', notificationId);
-
-      if (error) throw error;
-      return { message: 'Notification settings deleted successfully' };
-    } catch (error) {
-      console.error('Error deleting notification settings:', error);
-      throw error;
+  async remove(id: string): Promise<{ message: string }> {
+    const response = await this.supabaseService.client
+      .from('notifications')
+      .delete()
+      .eq('id', id);
+    if (response.error) {
+      throw new NotFoundException(response.error.message);
     }
+    return { message: 'Notification deleted successfully' };
   }
-} 
+}

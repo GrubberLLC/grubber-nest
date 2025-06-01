@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsArray, IsBoolean, IsOptional, IsEnum } from 'class-validator';
+import { IsString, IsArray, IsBoolean, IsOptional } from 'class-validator';
 
 export class CreateSettingsDto {
   @ApiProperty({
@@ -116,4 +116,4 @@ export class DeleteSettingsDto {
   })
   @IsString()
   settingsId!: string;
-} 
+}

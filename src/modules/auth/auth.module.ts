@@ -10,4 +10,4 @@ import { SupabaseModule } from '../supabase/supabase.module.js';
   providers: [AuthService],
   exports: [AuthService],
 })
-export class AuthModule {} 
+export class AuthModule {}

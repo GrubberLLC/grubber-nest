@@ -9,4 +9,4 @@ import { SupabaseService } from '../../services/supabase/supabase.service.js';
   providers: [ProfileService, SupabaseService],
   exports: [ProfileService],
 })
-export class ProfileModule {} 
+export class ProfileModule {}
