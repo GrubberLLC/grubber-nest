@@ -20,7 +20,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prepare": "[ \"$NODE_ENV\" != \"production\" ] && husky || echo \"Skipping husky in production\"",
-    "commit": "cz"
+    "commit": "cz",
+    "quick-commit": "git commit -m"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.1",
