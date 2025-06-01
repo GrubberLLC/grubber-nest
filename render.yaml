@@ -5,7 +5,7 @@ services:
     buildCommand: |
       export NODE_ENV=production
       npm install
-      npm run build
+      npx nest build --webpack
       ls -la dist
     startCommand: node dist/main.js
     envVars:
