@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: grubber-api
+    env: node
+    buildCommand: |
+      export NODE_ENV=production
+      npm install
+      npm run build
+      ls -la dist
+    startCommand: node dist/main.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+    healthCheckPath: /health
+    autoDeploy: true
+    branch: main 
