@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "type": "module",
   "scripts": {
-    "build": "npm exec nest build",
+    "build": "npm exec -- @nestjs/cli build",
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "ENV_FILE_PATH=.env.dev nest start",
     "start:dev": "ENV_FILE_PATH=.env.dev nest start --watch",
