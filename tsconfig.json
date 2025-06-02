@@ -17,7 +17,14 @@
     "noFallthroughCasesInSwitch": false,
     "strict": true,
     "esModuleInterop": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "types": ["node", "express", "jest"]
   },
-  "exclude": ["node_modules", "dist", "**/*.spec.ts", "**/*.test.ts", "test/**/*.ts"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "test/**/*.ts"
+  ]
 }
