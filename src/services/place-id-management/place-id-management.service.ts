@@ -35,7 +35,7 @@ export class PlaceIdManagementService {
     const placeLat = googlePlaceDetails.location?.latitude;
     const placeLng = googlePlaceDetails.location?.longitude;
 
-    this.logger.log(
+    this.logger.verbose(
       `getOrCreateInternalPlaceId: Processing Google ID '${googleId}' for place '${placeNameInput}'`,
     );
 
@@ -63,13 +63,13 @@ export class PlaceIdManagementService {
     const existingInternalId =
       await this.supabasePlaceDataService.getExternalPlaceIdMapping(googleId);
     if (existingInternalId) {
-      this.logger.log(
+      this.logger.verbose(
         `Found existing internal place ID '${existingInternalId}' for Google ID '${googleId}' via ExternalPlacesIds table.`,
       );
       return existingInternalId;
     }
 
-    this.logger.log(
+    this.logger.verbose(
       `No direct mapping in ExternalPlacesIds for Google ID '${googleId}'. Attempting fuzzy match for place '${placeName}'.`,
     );
     // 2. Attempt fuzzy matching if no direct mapping exists

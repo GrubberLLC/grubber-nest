@@ -9,13 +9,14 @@ import {
   FetchedGooglePhotoData,
   PlaceWithPhotosResponse,
 } from '../../types/places.types.js';
-
-const MAX_PHOTOS_TO_SHOW_IMMEDIATELY = 3;
+import {
+  MAX_PHOTOS_PER_PLACE,
+  MAX_PHOTOS_TO_SHOW_IMMEDIATELY,
+} from '../../constants/places.constants.js';
 
 @Injectable()
 export class PlacePhotoService {
   private readonly logger = new Logger(PlacePhotoService.name);
-  private readonly MAX_PHOTOS_PER_PLACE = 5;
 
   constructor(
     private readonly supabaseService: SupabaseService,
@@ -50,14 +51,14 @@ export class PlacePhotoService {
     }
 
     const currentPhotoCount = existingPhotoCount ?? 0;
-    if (currentPhotoCount >= this.MAX_PHOTOS_PER_PLACE) {
-      this.logger.log(
-        `Place ${internalPlaceId} already has ${currentPhotoCount} photos (max ${this.MAX_PHOTOS_PER_PLACE}). Skipping new photo processing.`,
+    if (currentPhotoCount >= MAX_PHOTOS_PER_PLACE) {
+      this.logger.verbose(
+        `Place ${internalPlaceId} already has ${currentPhotoCount} photos (max ${MAX_PHOTOS_PER_PLACE}). Skipping new photo processing.`,
       );
       return;
     }
 
-    const photosNeeded = this.MAX_PHOTOS_PER_PLACE - currentPhotoCount;
+    const photosNeeded = MAX_PHOTOS_PER_PLACE - currentPhotoCount;
     if (photosNeeded <= 0) {
       return;
     }
@@ -74,9 +75,10 @@ export class PlacePhotoService {
       return;
     }
 
-    this.logger.log(
+    this.logger.verbose(
       `Place ${internalPlaceId}: ${currentPhotoCount} existing, ${photosNeeded} needed, ${googlePhotoReferences.length} from Google being processed. Total available from Google: ${(placeDetail.photos || []).length}.`,
     );
+    const photosToInsert: SupabasePlacePhoto[] = [];
 
     for (const photoRef of googlePhotoReferences) {
       if (!photoRef?.name) {
@@ -87,9 +89,11 @@ export class PlacePhotoService {
       }
 
       try {
+        // fetch the photo data from google
         const googlePhotoData =
           await this.googlePlacesApiService.fetchPhotoData(photoRef.name);
 
+        // if there is no photo uri, skip
         if (!googlePhotoData?.photoUri) {
           this.logger.warn(
             `No photo URI from Google for ref: ${photoRef.name}, place ${internalPlaceId}. Cannot queue.`,
@@ -97,22 +101,24 @@ export class PlacePhotoService {
           continue;
         }
 
-        this.logger.log(
+        this.logger.verbose(
           `Fetched Google URI '${googlePhotoData.photoUri}' for ref '${photoRef.name}', place ${internalPlaceId} for queuing.`,
         );
 
-        // TODO: This is where the actual job submission to a queue for background processing would happen.
-        // For example, if using Bull:
-        // await this.imageProcessingQueue.add('upload-photo-to-supabase', {
-        //   placeId: internalPlaceId,
-        //   photoReferenceName: photoRef.name,
-        //   googlePhotoUri: googlePhotoData.photoUri,
-        //   maxHeight: photoRef.heightPx, // Or some configured max dimension
-        //   maxWidth: photoRef.widthPx,  // Or some configured max dimension
-        // });
+        // We need to insert the photo entries into the PlacePhotos table
 
-        this.logger.log(
-          `Successfully queued image processing job for place ${internalPlaceId}, photo ref ${photoRef.name}.`,
+        const photoToInsert: SupabasePlacePhoto = {
+          place_photo_id: undefined,
+          place_id: internalPlaceId,
+          photo_reference_name: photoRef.name,
+          storage_path: null,
+          original_uri: googlePhotoData.photoUri,
+        };
+
+        photosToInsert.push(photoToInsert);
+
+        this.logger.verbose(
+          `Successfully queued image processing job for place ${internalPlaceId}.`,
         );
       } catch (error) {
         this.logger.error(
@@ -120,6 +126,13 @@ export class PlacePhotoService {
           error instanceof Error ? error.stack : undefined,
         );
       }
+    }
+
+    if (photosToInsert.length > 0) {
+      this.logger.verbose(
+        `Inserting ${photosToInsert.length} photos for place ${internalPlaceId}`,
+      );
+      await this.insertSupabasePlacePhotos(photosToInsert);
     }
   }
 
@@ -246,10 +259,12 @@ export class PlacePhotoService {
       return places.map((p) => ({ ...p, photos: [] }));
     }
 
-    // fetch existing photos from supabase
+    // fetch existing photos from supabase using place ids
     const { data: existingPhotoRecords, error: photoError } = await supabase
       .from('PlacePhotos')
-      .select('place_id, storage_path, original_uri, photo_reference_name')
+      .select(
+        'place_id, storage_path, original_uri, photo_reference_name, supabase_uri',
+      )
       .in('place_id', placeIds);
 
     // if there is an error, log it
@@ -264,6 +279,7 @@ export class PlacePhotoService {
 
     // if there are photos, add them to the map
     if (existingPhotoRecords) {
+      // convert the existing photo records to an array of SupabasePlacePhoto and place_id
       for (const record of existingPhotoRecords as Array<
         SupabasePlacePhoto & { place_id: string }
       >) {
@@ -272,6 +288,7 @@ export class PlacePhotoService {
           storage_path: record.storage_path,
           original_uri: record.original_uri ?? '',
           photo_reference_name: record.photo_reference_name,
+          supabase_uri: record.supabase_uri ?? '',
         };
 
         // if the place id is not in the map, add it
@@ -287,7 +304,7 @@ export class PlacePhotoService {
     // create a map of place ids to google ids
     const placeIdToGoogleIdMap = new Map<string, string>();
 
-    // fetch external ids from supabase
+    // fetch external ids from supabase using place ids
     const { data: externalIdRecords, error: externalIdError } = await supabase
       .from('ExternalPlacesIds')
       .select('id, google_id')
@@ -300,6 +317,7 @@ export class PlacePhotoService {
       );
     } else if (externalIdRecords) {
       // if there are external ids, add them to the map
+      // convert the external id records to an array of id and google_id
       externalIdRecords.forEach((record) => {
         if (
           record.id &&
@@ -315,16 +333,14 @@ export class PlacePhotoService {
     // add photos to the places from the map
     const augmentedPlaces = await Promise.all(
       places.map(async (place) => {
+        // get the photos for the place
         let currentPhotos = place.place_id
           ? photosByPlaceId.get(place.place_id) || []
           : [];
         currentPhotos = [...currentPhotos];
 
         // if the place id is in the map and there are less than the max photos per place, fetch photos from google
-        if (
-          place.place_id &&
-          currentPhotos.length < this.MAX_PHOTOS_PER_PLACE
-        ) {
+        if (place.place_id && currentPhotos.length < MAX_PHOTOS_PER_PLACE) {
           // get the google id
           const googleId = placeIdToGoogleIdMap.get(place.place_id);
 
@@ -340,7 +356,7 @@ export class PlacePhotoService {
             // if the place details are not in the map, fetch them
             if (!placeDetailsFromGoogle) {
               this.logger.log(
-                `Place ${place.place_id} (Google ID: ${googleId}): Needs photo backfill. Details not pre-fetched, fetching now. Has ${currentPhotos.length}, max ${this.MAX_PHOTOS_PER_PLACE}`,
+                `Place ${place.place_id} (Google ID: ${googleId}): Needs photo backfill. Details not pre-fetched, fetching now. Has ${currentPhotos.length}, max ${MAX_PHOTOS_PER_PLACE}`,
               );
               try {
                 placeDetailsFromGoogle =
@@ -352,7 +368,7 @@ export class PlacePhotoService {
                 placeDetailsFromGoogle = null;
               }
             } else {
-              this.logger.log(
+              this.logger.verbose(
                 `Place ${place.place_id} (Google ID: ${googleId}): Using pre-fetched details for photo backfill.`,
               );
             }
@@ -366,7 +382,7 @@ export class PlacePhotoService {
                 currentPhotos.map((p) => p.photo_reference_name),
               );
               const photosStillNeeded =
-                this.MAX_PHOTOS_PER_PLACE - currentPhotos.length;
+                MAX_PHOTOS_PER_PLACE - currentPhotos.length;
 
               if (photosStillNeeded > 0 && place.place_id) {
                 const tempPhotosFromGoogle =
@@ -379,7 +395,7 @@ export class PlacePhotoService {
 
                 for (const tempPhoto of tempPhotosFromGoogle) {
                   currentPhotos.push(tempPhoto);
-                  this.logger.log(
+                  this.logger.verbose(
                     `Place ${place.place_id}: Added temp photo ref ${tempPhoto.photo_reference_name} for backfill.`,
                   );
                 }

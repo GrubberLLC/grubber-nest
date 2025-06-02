@@ -10,7 +10,7 @@ import {
   PlaceWithPhotosResponse,
   PlaceCoreData,
 } from '../../types/places.types.js'; // Adjust path as needed
-
+import { MAX_PLACES_PER_QUERY } from '../../constants/places.constants.js';
 @Injectable()
 export class SupabasePlaceDataService {
   private readonly logger = new Logger(SupabasePlaceDataService.name);
@@ -39,6 +39,7 @@ export class SupabasePlaceDataService {
     );
     try {
       const supabase = this.supabaseService.client;
+      // fetch places with a bounding box of about 7mi
       let query = supabase
         .from('Places')
         .select('*')
@@ -47,18 +48,23 @@ export class SupabasePlaceDataService {
         .lte('longitude', longitude + 0.1)
         .gte('longitude', longitude - 0.1);
 
+      // if there is a keyword, add a text search to the query
       if (keyword && keyword.trim() !== '') {
         query = query.or(
           `name.ilike.%${keyword}%,description.ilike.%${keyword}%,category.ilike.%${keyword}%`,
         );
       }
 
-      const { data, error } = await query.limit(20);
+      // limit the query to 20 places
+      const { data, error } = await query.limit(MAX_PLACES_PER_QUERY);
 
+      // if there is an error, log it and return an empty array
       if (error) {
         this.logger.error(`Error fetching places from DB: ${error.message}`);
         return [];
       }
+
+      // return the data
       return (data as PlaceWithPhotosResponse[]) || [];
     } catch (error) {
       this.logger.error(

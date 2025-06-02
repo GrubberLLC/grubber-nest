@@ -28,7 +28,7 @@ export class SupabaseService implements OnModuleInit {
         },
       });
 
-      this.logger.log('Supabase client initialized successfully.');
+      this.logger.verbose('Supabase client initialized successfully.');
     } catch (error) {
       this.logger.error('Failed to initialize Supabase client:', error);
       throw error;
