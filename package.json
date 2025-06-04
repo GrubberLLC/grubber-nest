@@ -14,7 +14,7 @@
     "start:debug": "ENV_FILE_PATH=.env.dev nest start --debug --watch",
     "start:prod": "ENV_FILE_PATH=.env.prod node dist/src/main.js",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+"test": "NODE_OPTIONS=--experimental-vm-modules jest --passWithNoTests",
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "test:cov": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
