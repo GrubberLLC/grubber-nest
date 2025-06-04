@@ -21,6 +21,8 @@ async function bootstrap() {
     logger: activeLogLevels,
   });
 
+  console.log(process.env.NODE_ENV);
+
   app.enableCors({
     origin: 'https://grubber.github.io',
   });
