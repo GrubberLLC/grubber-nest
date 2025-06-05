@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsArray, IsBoolean, IsOptional } from 'class-validator';
+import { IsString, IsBoolean, IsOptional } from 'class-validator';
 
 export class CreateSettingsDto {
   @ApiProperty({
@@ -30,26 +30,6 @@ export class CreateSettingsDto {
   primaryLocation?: string;
 
   @ApiProperty({
-    description: 'Willing to travel',
-    example: true,
-    required: false,
-    default: true,
-  })
-  @IsBoolean()
-  @IsOptional()
-  willingToTravel?: boolean;
-
-  @ApiProperty({
-    description: 'Preferred meal types',
-    example: ['Breakfast', 'Dinner'],
-    required: false,
-    type: [String],
-  })
-  @IsArray()
-  @IsOptional()
-  preferredMealTypes?: string[];
-
-  @ApiProperty({
     description: 'Primary usage',
     example: 'Personal',
     required: false,
@@ -57,15 +37,6 @@ export class CreateSettingsDto {
   @IsString()
   @IsOptional()
   primaryUsage?: string;
-
-  @ApiProperty({
-    description: 'Frequency of reviews',
-    example: 'Weekly',
-    required: false,
-  })
-  @IsString()
-  @IsOptional()
-  frequencyOfReviews?: string;
 
   @ApiProperty({
     description: 'Receive notifications',

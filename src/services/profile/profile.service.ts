@@ -83,7 +83,7 @@ export class ProfileService {
         data,
         error,
       }: { data: Profile | null; error: PostgrestError | null } = await supabase
-        .from('Profile')
+        .from('Profiles')
         .select('*')
         .eq('user_id', userId)
         .single();
@@ -109,20 +109,20 @@ export class ProfileService {
         data,
         error,
       }: { data: Profile | null; error: PostgrestError | null } = await supabase
-        .from('Profile')
+        .from('Profiles')
         .update({
           username: profileData.username,
           email: profileData.email,
-          first_name: profileData.firstName,
-          last_name: profileData.lastName,
+          firstName: profileData.firstName,
+          lastName: profileData.lastName,
           bio: profileData.bio,
           phone: profileData.phone,
           verified: profileData.verified,
           public: profileData.public,
-          profile_picture: profileData.profilePicture,
-          fcm_token: profileData.fcmToken,
-          account_name: profileData.accountName,
-          show_tutorial: profileData.showTutorial,
+          profileImage: profileData.profileImage,
+          fcmToken: profileData.fcmToken,
+          accountName: profileData.accountName,
+          showTutorial: profileData.showTutorial,
           testing: profileData.testing,
         })
         .eq('id', profileData.id)
@@ -147,7 +147,7 @@ export class ProfileService {
       const supabase = this.supabaseService.client;
 
       const { error } = (await supabase
-        .from('Profile')
+        .from('Profiles')
         .delete()
         .eq('id', profileId)) as PostgrestResponse<null>; // Ensuring delete response is typed
 

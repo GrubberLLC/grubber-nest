@@ -12,10 +12,7 @@ interface UserSettings {
   user_id: string;
   privacy_level?: string | null;
   primary_location?: string | null;
-  willing_to_travel?: boolean | null;
-  preferred_meal_types?: string[] | null;
   primary_usage?: string | null;
-  frequency_of_reviews?: string | null;
   receive_notifications?: boolean | null;
   newsletter_subscription?: boolean | null;
 }
@@ -43,15 +40,11 @@ export class SettingsService {
           .insert([
             {
               user_id: settingsData.userId,
-              privacy_level: settingsData.privacyLevel || 'Friends',
+              privacy_level: settingsData.privacyLevel || 'Public',
               primary_location: settingsData.primaryLocation,
-              willing_to_travel: settingsData.willingToTravel ?? true,
-              preferred_meal_types: settingsData.preferredMealTypes,
-              primary_usage: settingsData.primaryUsage,
-              frequency_of_reviews: settingsData.frequencyOfReviews,
-              receive_notifications: settingsData.receiveNotifications ?? true,
-              newsletter_subscription:
-                settingsData.newsletterSubscription ?? false,
+              primary_usage: 'All',
+              receive_notifications: true,
+              newsletter_subscription: true,
             },
           ])
           .select()
