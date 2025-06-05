@@ -93,10 +93,7 @@ export class SettingsService {
           .update({
             privacy_level: settingsData.privacyLevel,
             primary_location: settingsData.primaryLocation,
-            willing_to_travel: settingsData.willingToTravel,
-            preferred_meal_types: settingsData.preferredMealTypes,
             primary_usage: settingsData.primaryUsage,
-            frequency_of_reviews: settingsData.frequencyOfReviews,
             receive_notifications: settingsData.receiveNotifications,
             newsletter_subscription: settingsData.newsletterSubscription,
           })
