@@ -102,7 +102,7 @@ export class CreatePreferenceDto {
     type: [String],
   })
   @IsArray()
-  foodAllergies!: string[];
+  allergies!: string[];
 
   @ApiProperty({
     description: 'Health preferences',
@@ -130,7 +130,7 @@ export class CreatePreferenceDto {
   })
   @IsArray()
   @IsOptional()
-  preferredMealTypes?: string[];
+  mealPreference?: string[];
 
   @ApiProperty({
     description: 'Dining time preferences',
@@ -140,7 +140,7 @@ export class CreatePreferenceDto {
   })
   @IsArray()
   @IsOptional()
-  diningTimePreferences?: string[];
+  diningPreferences?: string[];
 
   @ApiProperty({
     description: 'Meal occasion preferences',

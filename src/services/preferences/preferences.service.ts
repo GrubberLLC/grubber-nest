@@ -11,15 +11,15 @@ import {
 import { PostgrestResponse } from '@supabase/supabase-js';
 
 export interface UserPreferences {
-  id: string;
-  user_id: string;
-  dietary_restrictions?: string[];
-  favorite_cuisines?: string[];
-  price_range?: string;
-  preferred_radius?: number;
-  theme?: string;
-  language?: string;
-  notifications_enabled?: boolean;
+  userId: string;
+  favoriteCuisines?: string[];
+  leastFavoriteCuisines?: string[];
+  allergies?: string[];
+  dietaryRestrictions?: string[];
+  flavorPreferences?: string[];
+  diningPreferences?: string[];
+  diningFrequency?: string;
+  mealPreference?: string;
 }
 
 @Injectable()
@@ -27,11 +27,31 @@ export class PreferencesService {
   constructor(private readonly supabaseService: SupabaseService) {}
 
   async create(
-    createUserPreferencesDto: CreatePreferencesDto,
+    userId: string,
+    favoriteCuisines: string[],
+    leastFavoriteCuisines: string[],
+    allergies: string[],
+    dietaryRestrictions: string[],
+    flavorPreferences: string[],
+    diningPreferences: string[],
+    diningFrequency: string,
+    mealPreference: string,
   ): Promise<UserPreferences> {
     const response = await this.supabaseService.client
       .from('user_preferences')
-      .insert([createUserPreferencesDto])
+      .insert([
+        {
+          user_id: userId,
+          favorite_cuisines: favoriteCuisines,
+          least_favorite_cuisines: leastFavoriteCuisines,
+          allergies: allergies,
+          dietary_restrictions: dietaryRestrictions,
+          flavor_preferences: flavorPreferences,
+          dining_preferences: diningPreferences,
+          dining_frequency: diningFrequency,
+          meal_preference: mealPreference,
+        },
+      ])
       .select()
       .single();
     if (response.error || !response.data) {

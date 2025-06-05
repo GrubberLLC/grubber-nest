@@ -27,8 +27,20 @@ export class ProfileService {
 
   constructor(private readonly supabaseService: SupabaseService) {}
 
-  async createProfile(profileData: CreateProfileDto): Promise<Profile | null> {
-    this.logger.log(`Creating profile for user: ${profileData.userId}`);
+  async createProfile(
+    userId: string,
+    username: string,
+    email: string,
+    firstName: string,
+    lastName: string,
+    bio: string,
+    phone: string,
+    location: string,
+    profileImage: string,
+    longitude: number,
+    latitude: number,
+  ): Promise<Profile | null> {
+    this.logger.log(`Creating profile for user: ${userId}`);
 
     try {
       const supabase = this.supabaseService.client;
@@ -40,22 +52,22 @@ export class ProfileService {
         .from('Profiles')
         .insert([
           {
-            userId: profileData.userId,
-            username: profileData.username,
-            email: profileData.email,
-            firstName: profileData.firstName,
-            lastName: profileData.lastName,
-            bio: profileData.bio,
-            phone: profileData.phone,
-            location: profileData?.location,
-            longitude: profileData?.longitude,
-            latitude: profileData?.latitude,
+            user_id: userId,
+            username: username,
+            email: email,
+            first_name: firstName,
+            last_name: lastName,
+            bio: bio,
+            phone: phone,
+            location: location,
+            longitude: longitude,
+            latitude: latitude,
             verified: false,
             public: true,
-            profileImage: profileData?.profileImage,
-            fcmToken: '',
-            accountName: profileData?.firstName + ' ' + profileData?.lastName,
-            showTutorial: true,
+            profile_image: profileImage,
+            fcm_token: '',
+            account_name: firstName + ' ' + lastName,
+            show_tutorial: true,
             testing: false,
           },
         ])
