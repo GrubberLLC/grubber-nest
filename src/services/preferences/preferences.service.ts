@@ -49,7 +49,7 @@ export class PreferencesService {
     Logger.log(`Meal preference: ${mealPreference}`);
 
     const response = await this.supabaseService.client
-      .from('user_preferences')
+      .from('Preferences')
       .insert([
         {
           user_id: userId,
