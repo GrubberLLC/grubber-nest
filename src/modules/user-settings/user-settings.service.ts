@@ -12,9 +12,10 @@ import {
 export interface UserSettings {
   id: number;
   user_id: string;
-  email_notifications: boolean;
-  push_notifications: boolean;
-  sms_notifications: boolean;
+  primary_location: string;
+  primary_usage: string;
+  receive_notifications: boolean;
+  newsletter_subscription: boolean;
   created_at: string;
   updated_at: string;
 }

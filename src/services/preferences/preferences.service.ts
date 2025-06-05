@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service.js';
 import {
@@ -37,6 +38,16 @@ export class PreferencesService {
     diningFrequency: string,
     mealPreference: string,
   ): Promise<UserPreferences> {
+    Logger.log(`Creating preferences for user: ${userId}`);
+    Logger.log(`Favorite cuisines: ${favoriteCuisines.join(', ')}`);
+    Logger.log(`Least favorite cuisines: ${leastFavoriteCuisines.join(', ')}`);
+    Logger.log(`Allergies: ${allergies.join(', ')}`);
+    Logger.log(`Dietary restrictions: ${dietaryRestrictions.join(', ')}`);
+    Logger.log(`Flavor preferences: ${flavorPreferences.join(', ')}`);
+    Logger.log(`Dining preferences: ${diningPreferences.join(', ')}`);
+    Logger.log(`Dining frequency: ${diningFrequency}`);
+    Logger.log(`Meal preference: ${mealPreference}`);
+
     const response = await this.supabaseService.client
       .from('user_preferences')
       .insert([
@@ -54,11 +65,15 @@ export class PreferencesService {
       ])
       .select()
       .single();
+    Logger.log(`Response: ${JSON.stringify(response)}`);
     if (response.error || !response.data) {
       throw new InternalServerErrorException(
         response.error?.message || 'Failed to create preferences',
       );
     }
+    Logger.log(
+      `Preferences created successfully: ${JSON.stringify(response.data)}`,
+    );
     return response.data as UserPreferences;
   }
 
