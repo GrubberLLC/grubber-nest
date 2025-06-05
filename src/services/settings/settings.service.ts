@@ -31,7 +31,6 @@ export class SettingsService {
 
     try {
       const supabase = this.supabaseService.client;
-
       const {
         data,
         error,
