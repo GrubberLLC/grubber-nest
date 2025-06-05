@@ -7,23 +7,18 @@ import {
 } from '../../controllers/profile/dto/profile.dto.js';
 import { PostgrestResponse, PostgrestError } from '@supabase/supabase-js';
 
-// Define the Profile interface based on database schema
 interface Profile {
-  id: string;
-  user_id: string;
+  userId: string;
   username?: string | null;
   email?: string | null;
-  first_name?: string | null;
-  last_name?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
   bio?: string | null;
   phone?: string | null;
-  verified?: boolean;
-  public?: boolean;
-  profile_picture?: string | null;
-  fcm_token?: string | null;
-  account_name?: string | null;
-  show_tutorial?: boolean;
-  testing?: boolean;
+  location?: string | null;
+  profileImage?: string | null;
+  longitude?: number | null;
+  latitude?: number | null;
 }
 
 @Injectable()
@@ -45,20 +40,23 @@ export class ProfileService {
         .from('Profile')
         .insert([
           {
-            user_id: profileData.userId,
+            userId: profileData.userId,
             username: profileData.username,
             email: profileData.email,
-            first_name: profileData.firstName,
-            last_name: profileData.lastName,
+            firstName: profileData.firstName,
+            lastName: profileData.lastName,
             bio: profileData.bio,
             phone: profileData.phone,
-            verified: profileData.verified ?? false,
-            public: profileData.public ?? true,
-            profile_picture: profileData.profilePicture,
-            fcm_token: profileData.fcmToken,
-            account_name: profileData.accountName,
-            show_tutorial: profileData.showTutorial ?? true,
-            testing: profileData.testing ?? false,
+            location: profileData.location,
+            longitude: profileData.longitude,
+            latitude: profileData.latitude,
+            verified: false,
+            public: true,
+            profileImage: profileData.profileImage,
+            fcmToken: '',
+            accountName: profileData.firstName + ' ' + profileData.lastName,
+            showTutorial: true,
+            testing: false,
           },
         ])
         .select()
