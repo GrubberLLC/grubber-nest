@@ -37,7 +37,7 @@ export class ProfileService {
         data,
         error,
       }: { data: Profile | null; error: PostgrestError | null } = await supabase
-        .from('Profile')
+        .from('Profiles')
         .insert([
           {
             userId: profileData.userId,
