@@ -40,7 +40,17 @@ export class ProfileService {
     longitude: number,
     latitude: number,
   ): Promise<Profile | null> {
-    this.logger.log(`Creating profile for user: ${userId}`);
+    Logger.log(`Creating profile for user: ${userId}`);
+    Logger.log(`Username: ${username}`);
+    Logger.log(`Email: ${email}`);
+    Logger.log(`First Name: ${firstName}`);
+    Logger.log(`Last Name: ${lastName}`);
+    Logger.log(`Bio: ${bio}`);
+    Logger.log(`Phone: ${phone}`);
+    Logger.log(`Location: ${location}`);
+    Logger.log(`Profile Image: ${profileImage}`);
+    Logger.log(`Longitude: ${longitude}`);
+    Logger.log(`Latitude: ${latitude}`);
 
     try {
       const supabase = this.supabaseService.client;
@@ -73,6 +83,9 @@ export class ProfileService {
         ])
         .select()
         .single();
+
+      Logger.log(`Data: ${JSON.stringify(data)}`);
+      Logger.log(`Error: ${JSON.stringify(error)}`);
 
       if (error) {
         throw new Error(`Failed to create profile: ${error.message}`);

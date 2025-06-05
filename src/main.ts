@@ -3,6 +3,7 @@ import { RootModule } from './modules/root.module.js';
 import { ValidationPipe, Logger, LogLevel } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
+
 async function bootstrap() {
   // Determine log levels based on environment
   const defaultLogLevels: LogLevel[] = ['log', 'error', 'warn'];
@@ -34,6 +35,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  app.useLogger(['log', 'error', 'warn', 'debug', 'verbose']);
 
   // Set up Swagger documentation
   const config = new DocumentBuilder()
