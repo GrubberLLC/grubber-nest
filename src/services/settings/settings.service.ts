@@ -1,20 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service.js';
 import { getErrorMessage } from '../../types/supabase.types.js';
-import {
-  CreateSettingsDto,
-  UpdateSettingsDto,
-} from '../../controllers/settings/dto/settings.dto.js';
+import { UpdateSettingsDto } from '../../controllers/settings/dto/settings.dto.js';
 import { PostgrestResponse, PostgrestError } from '@supabase/supabase-js';
 
 interface UserSettings {
-  settings_id: string;
   user_id: string;
-  privacy_level?: string | null;
   primary_location?: string | null;
-  primary_usage?: string | null;
-  receive_notifications?: boolean | null;
-  newsletter_subscription?: boolean | null;
 }
 
 @Injectable()
