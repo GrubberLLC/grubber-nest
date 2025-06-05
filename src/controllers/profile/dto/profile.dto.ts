@@ -134,6 +134,24 @@ export class CreateProfileDto {
   @IsBoolean()
   @IsOptional()
   testing?: boolean;
+
+  @ApiProperty({ description: 'Location', required: false })
+  @IsString()
+  @IsOptional()
+  location?: string;
+
+  @ApiProperty({ description: 'Longitude', required: false })
+  @IsOptional()
+  longitude?: number;
+
+  @ApiProperty({ description: 'Latitude', required: false })
+  @IsOptional()
+  latitude?: number;
+
+  @ApiProperty({ description: 'Profile image URL', required: false })
+  @IsString()
+  @IsOptional()
+  profileImage?: string;
 }
 
 export class UpdateProfileDto extends CreateProfileDto {
