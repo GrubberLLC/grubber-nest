@@ -2,100 +2,199 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsBoolean, IsArray, IsOptional } from 'class-validator';
 
 export class CreatePreferencesDto {
-  @ApiProperty({ description: 'ID of the user' })
+  @ApiProperty({ description: 'User ID', example: '123' })
   @IsString()
-  user_id!: string;
+  userId!: string;
 
+  @ApiProperty({
+    description: 'Favorite cuisines',
+    type: [String],
+    required: false,
+  })
   @IsArray()
+  @IsOptional()
   @IsString({ each: true })
-  @ApiProperty({ description: 'User theme preference' })
-  favorite_cuisines?: string[] = [];
+  favoriteCuisines?: string[];
 
+  @ApiProperty({
+    description: 'Least favorite cuisines',
+    type: [String],
+    required: false,
+  })
   @IsArray()
-  @IsString({ each: true })
   @IsOptional()
-  least_favorite_cuisines?: string[] = [];
+  @IsString({ each: true })
+  leastFavoriteCuisines?: string[];
 
+  @ApiProperty({
+    description: 'Cuisines willing to try',
+    type: [String],
+    required: false,
+  })
   @IsArray()
-  @IsString({ each: true })
   @IsOptional()
-  cuisines_willing_to_try?: string[] = [];
+  @IsString({ each: true })
+  cuisinesWillingToTry?: string[];
 
+  @ApiProperty({
+    description: 'Diet type',
+    type: [String],
+    required: false,
+  })
   @IsArray()
-  @IsString({ each: true })
   @IsOptional()
-  diet_type?: string[] = [];
+  @IsString({ each: true })
+  dietType?: string[];
 
+  @ApiProperty({
+    description: 'Food allergies',
+    type: [String],
+    required: false,
+  })
   @IsArray()
-  @IsString({ each: true })
   @IsOptional()
-  food_allergies?: string[] = [];
+  @IsString({ each: true })
+  foodAllergies?: string[];
 
+  @ApiProperty({
+    description: 'Health preferences',
+    type: [String],
+    required: false,
+  })
   @IsArray()
-  @IsString({ each: true })
   @IsOptional()
-  health_preferences?: string[] = [];
+  @IsString({ each: true })
+  healthPreferences?: string[];
 
+  @ApiProperty({
+    description: 'Dietary restrictions',
+    type: [String],
+    required: false,
+  })
   @IsArray()
-  @IsString({ each: true })
   @IsOptional()
-  dietary_restrictions?: string[] = [];
+  @IsString({ each: true })
+  dietaryRestrictions?: string[];
 
+  @ApiProperty({
+    description: 'Preferred meal types',
+    type: [String],
+    required: false,
+  })
   @IsArray()
-  @IsString({ each: true })
   @IsOptional()
-  preferred_meal_types?: string[] = [];
+  @IsString({ each: true })
+  preferredMealTypes?: string[];
 
+  @ApiProperty({
+    description: 'Dining time preferences',
+    type: [String],
+    required: false,
+  })
   @IsArray()
-  @IsString({ each: true })
   @IsOptional()
-  dining_time_preferences?: string[] = [];
+  @IsString({ each: true })
+  diningTimePreferences?: string[];
 
+  @ApiProperty({
+    description: 'Meal occasion preferences',
+    type: [String],
+    required: false,
+  })
   @IsArray()
-  @IsString({ each: true })
   @IsOptional()
-  meal_occasion_preferences?: string[] = [];
+  @IsString({ each: true })
+  mealOccasionPreferences?: string[];
 
+  @ApiProperty({
+    description: 'Preferred flavors',
+    type: [String],
+    required: false,
+  })
   @IsArray()
-  @IsString({ each: true })
   @IsOptional()
-  preferred_flavors?: string[] = [];
+  @IsString({ each: true })
+  preferredFlavors?: string[];
 
+  @ApiProperty({
+    description: 'Disliked flavors',
+    type: [String],
+    required: false,
+  })
   @IsArray()
-  @IsString({ each: true })
   @IsOptional()
-  disliked_flavors?: string[] = [];
+  @IsString({ each: true })
+  dislikedFlavors?: string[];
 
+  @ApiProperty({
+    description: 'Preferred atmosphere',
+    type: [String],
+    required: false,
+  })
   @IsArray()
-  @IsString({ each: true })
   @IsOptional()
-  preferred_atmosphere?: string[] = [];
+  @IsString({ each: true })
+  preferredAtmosphere?: string[];
 
+  @ApiProperty({
+    description: 'Dining companions',
+    type: [String],
+    required: false,
+  })
   @IsArray()
+  @IsOptional()
   @IsString({ each: true })
-  @IsOptional()
-  dining_companions?: string[] = [];
+  diningCompanions?: string[];
 
-  @IsString()
-  @IsOptional()
-  dining_frequency?: string;
-
-  @IsString()
-  @IsOptional()
-  primary_location?: string;
-
-  @IsString()
-  @IsOptional()
-  travel_distance?: string;
-
-  @IsString()
-  @IsOptional()
-  willingness_to_explore?: string;
-
+  @ApiProperty({
+    description: 'Dining frequency',
+    type: [String],
+    required: false,
+  })
   @IsArray()
-  @IsString({ each: true })
   @IsOptional()
-  rating_criteria?: string[] = [];
+  @IsString({ each: true })
+  diningFrequency?: string[];
+
+  @ApiProperty({
+    description: 'Primary location',
+    type: [String],
+    required: false,
+  })
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  primaryLocation?: string[];
+
+  @ApiProperty({
+    description: 'Travel distance',
+    type: [String],
+    required: false,
+  })
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  travelDistance?: string[];
+
+  @ApiProperty({
+    description: 'Willingness to explore',
+    type: [String],
+    required: false,
+  })
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  willingnessToExplore?: string[];
+
+  @ApiProperty({
+    description: 'Rating criteria',
+    type: [String],
+    required: false,
+  })
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  ratingCriteria?: string[];
 }
 
 export class UpdatePreferencesDto {
@@ -113,193 +212,198 @@ export class UpdatePreferencesDto {
 }
 
 export class CreatePreferenceDto {
-  @ApiProperty({
-    description: 'User ID',
-    example: 1,
-    required: true,
-  })
+  @ApiProperty({ description: 'User ID', example: '123' })
   @IsString()
   userId!: string;
 
   @ApiProperty({
     description: 'Favorite cuisines',
-    example: ['Italian', 'Japanese', 'Mexican'],
-    required: false,
     type: [String],
+    required: false,
   })
   @IsArray()
   @IsOptional()
+  @IsString({ each: true })
   favoriteCuisines?: string[];
 
   @ApiProperty({
     description: 'Least favorite cuisines',
-    example: ['Thai', 'Indian'],
-    required: false,
     type: [String],
+    required: false,
   })
   @IsArray()
   @IsOptional()
+  @IsString({ each: true })
   leastFavoriteCuisines?: string[];
 
   @ApiProperty({
     description: 'Cuisines willing to try',
-    example: ['Korean', 'Ethiopian'],
-    required: false,
     type: [String],
+    required: false,
   })
   @IsArray()
   @IsOptional()
+  @IsString({ each: true })
   cuisinesWillingToTry?: string[];
 
   @ApiProperty({
     description: 'Diet type',
-    example: 'Vegetarian',
-    required: true,
-  })
-  @IsString()
-  dietType!: string;
-
-  @ApiProperty({
-    description: 'Food allergies',
-    example: ['Peanuts', 'Shellfish'],
-    required: true,
     type: [String],
-  })
-  @IsArray()
-  allergies!: string[];
-
-  @ApiProperty({
-    description: 'Health preferences',
-    example: ['Low-carb', 'High-protein'],
     required: false,
-    type: [String],
   })
   @IsArray()
   @IsOptional()
+  @IsString({ each: true })
+  dietType?: string[];
+
+  @ApiProperty({
+    description: 'Food allergies',
+    type: [String],
+    required: false,
+  })
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  foodAllergies?: string[];
+
+  @ApiProperty({
+    description: 'Health preferences',
+    type: [String],
+    required: false,
+  })
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
   healthPreferences?: string[];
 
   @ApiProperty({
     description: 'Dietary restrictions',
-    example: 'Halal',
-    required: true,
+    type: [String],
+    required: false,
   })
-  @IsString()
-  dietaryRestrictions!: string;
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  dietaryRestrictions?: string[];
 
   @ApiProperty({
     description: 'Preferred meal types',
-    example: ['Breakfast', 'Dinner'],
-    required: false,
     type: [String],
+    required: false,
   })
   @IsArray()
   @IsOptional()
-  mealPreference?: string[];
+  @IsString({ each: true })
+  preferredMealTypes?: string[];
 
   @ApiProperty({
     description: 'Dining time preferences',
-    example: ['Evening', 'Late Night'],
-    required: false,
     type: [String],
+    required: false,
   })
   @IsArray()
   @IsOptional()
-  diningPreferences?: string[];
+  @IsString({ each: true })
+  diningTimePreferences?: string[];
 
   @ApiProperty({
     description: 'Meal occasion preferences',
-    example: ['Casual', 'Fine Dining'],
-    required: false,
     type: [String],
+    required: false,
   })
   @IsArray()
   @IsOptional()
+  @IsString({ each: true })
   mealOccasionPreferences?: string[];
 
   @ApiProperty({
     description: 'Preferred flavors',
-    example: ['Sweet', 'Spicy'],
-    required: false,
     type: [String],
+    required: false,
   })
   @IsArray()
   @IsOptional()
+  @IsString({ each: true })
   preferredFlavors?: string[];
 
   @ApiProperty({
     description: 'Disliked flavors',
-    example: ['Bitter', 'Sour'],
-    required: false,
     type: [String],
+    required: false,
   })
   @IsArray()
   @IsOptional()
+  @IsString({ each: true })
   dislikedFlavors?: string[];
 
   @ApiProperty({
     description: 'Preferred atmosphere',
-    example: ['Cozy', 'Vibrant'],
-    required: false,
     type: [String],
+    required: false,
   })
   @IsArray()
   @IsOptional()
+  @IsString({ each: true })
   preferredAtmosphere?: string[];
 
   @ApiProperty({
     description: 'Dining companions',
-    example: ['Family', 'Friends'],
-    required: false,
     type: [String],
+    required: false,
   })
   @IsArray()
   @IsOptional()
+  @IsString({ each: true })
   diningCompanions?: string[];
 
   @ApiProperty({
     description: 'Dining frequency',
-    example: 'Weekly',
-    required: false,
-  })
-  @IsString()
-  @IsOptional()
-  diningFrequency?: string;
-
-  @ApiProperty({
-    description: 'Primary location',
-    example: 'New York City',
-    required: false,
-  })
-  @IsString()
-  @IsOptional()
-  primaryLocation?: string;
-
-  @ApiProperty({
-    description: 'Travel distance',
-    example: 'Medium',
-    required: false,
-  })
-  @IsString()
-  @IsOptional()
-  travelDistance?: string;
-
-  @ApiProperty({
-    description: 'Willingness to explore',
-    example: 'High',
-    required: false,
-  })
-  @IsString()
-  @IsOptional()
-  willingnessToExplore?: string;
-
-  @ApiProperty({
-    description: 'Rating criteria',
-    example: ['Taste', 'Service'],
-    required: false,
     type: [String],
+    required: false,
   })
   @IsArray()
   @IsOptional()
+  @IsString({ each: true })
+  diningFrequency?: string[];
+
+  @ApiProperty({
+    description: 'Primary location',
+    type: [String],
+    required: false,
+  })
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  primaryLocation?: string[];
+
+  @ApiProperty({
+    description: 'Travel distance',
+    type: [String],
+    required: false,
+  })
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  travelDistance?: string[];
+
+  @ApiProperty({
+    description: 'Willingness to explore',
+    type: [String],
+    required: false,
+  })
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
+  willingnessToExplore?: string[];
+
+  @ApiProperty({
+    description: 'Rating criteria',
+    type: [String],
+    required: false,
+  })
+  @IsArray()
+  @IsOptional()
+  @IsString({ each: true })
   ratingCriteria?: string[];
 }
 
