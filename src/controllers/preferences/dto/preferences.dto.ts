@@ -194,6 +194,7 @@ export class CreatePreferencesDto {
   @IsOptional()
   @IsString({ each: true })
   ratingCriteria?: string[];
+  flavorPreferences?: string[];
 }
 
 export class UpdatePreferencesDto {

@@ -27,6 +27,16 @@ export interface UserPreferences {
 export class PreferencesService {
   constructor(private readonly supabaseService: SupabaseService) {}
 
+  // userId,
+  //         favoriteCuisines,
+  //         leastFavoriteCuisines,
+  //         foodAlergies: allergies,
+  //         dietType: 'vegam',
+  //         dietaryRestrictions,
+  //         flavorPreferences,
+  //         diningPreferences,
+  //         diningFrequency,
+  //         mealPreference,
   async create(dto: CreatePreferencesDto): Promise<UserPreferences> {
     const response = await this.supabaseService.client
       .from('Preferences')
@@ -40,6 +50,8 @@ export class PreferencesService {
           dietary_restrictions: dto.dietaryRestrictions?.join(',') ?? null,
           preferred_atmosphere: dto.preferredAtmosphere?.join(',') ?? null,
           dining_frequency: dto.diningFrequency ?? null,
+          meal_preference: dto.preferredAtmosphere ?? null,
+          flavor_preferences: dto.flavorPreferences?.join(',') ?? null,
         },
       ])
       .select()
