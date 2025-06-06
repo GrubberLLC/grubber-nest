@@ -15,7 +15,7 @@ export interface UserPreferences {
   userId: string;
   favoriteCuisines?: string[];
   leastFavoriteCuisines?: string[];
-  allergies?: string[];
+  foodAllergies?: string[];
   dietaryRestrictions?: string[];
   flavorPreferences?: string[];
   diningPreferences?: string[];
@@ -31,22 +31,12 @@ export class PreferencesService {
     userId: string,
     favoriteCuisines: string[],
     leastFavoriteCuisines: string[],
-    allergies: string[],
+    foodAllergies: string[],
+    dietType: string[],
     dietaryRestrictions: string[],
-    flavorPreferences: string[],
-    diningPreferences: string[],
+    preferredAtmosphere: string[],
     diningFrequency: string,
-    mealPreference: string,
   ): Promise<UserPreferences> {
-    Logger.log(`Creating preferences for user: ${userId}`);
-    Logger.log(`Favorite cuisines: ${favoriteCuisines.join(', ')}`);
-    Logger.log(`Least favorite cuisines: ${leastFavoriteCuisines.join(', ')}`);
-    Logger.log(`Allergies: ${allergies.join(', ')}`);
-    Logger.log(`Dietary restrictions: ${dietaryRestrictions.join(', ')}`);
-    Logger.log(`Flavor preferences: ${flavorPreferences.join(', ')}`);
-    Logger.log(`Dining preferences: ${diningPreferences.join(', ')}`);
-    Logger.log(`Dining frequency: ${diningFrequency}`);
-    Logger.log(`Meal preference: ${mealPreference}`);
 
     const response = await this.supabaseService.client
       .from('Preferences')
@@ -55,12 +45,11 @@ export class PreferencesService {
           user_id: userId,
           favorite_cuisines: favoriteCuisines,
           least_favorite_cuisines: leastFavoriteCuisines,
-          allergies: allergies,
+          food_allergies: foodAllergies,
           dietary_restrictions: dietaryRestrictions,
-          flavor_preferences: flavorPreferences,
-          dining_preferences: diningPreferences,
+          diet_type: dietType,
+          preferred_atmosphere: preferredAtmosphere,
           dining_frequency: diningFrequency,
-          meal_preference: mealPreference,
         },
       ])
       .select()
