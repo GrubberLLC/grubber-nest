@@ -40,18 +40,6 @@ export class ProfileService {
     longitude: number,
     latitude: number,
   ): Promise<Profile | null> {
-    Logger.log(`Creating profile for user: ${userId}`);
-    Logger.log(`Username: ${username}`);
-    Logger.log(`Email: ${email}`);
-    Logger.log(`First Name: ${firstName}`);
-    Logger.log(`Last Name: ${lastName}`);
-    Logger.log(`Bio: ${bio}`);
-    Logger.log(`Phone: ${phone}`);
-    Logger.log(`Location: ${location}`);
-    Logger.log(`Profile Image: ${profileImage}`);
-    Logger.log(`Longitude: ${longitude}`);
-    Logger.log(`Latitude: ${latitude}`);
-
     try {
       const supabase = this.supabaseService.client;
 
