@@ -28,7 +28,7 @@ export class SettingsService {
         error,
       }: { data: UserSettings | null; error: PostgrestError | null } =
         await supabase
-          .from('UserSettings')
+          .from('Settings')
           .insert([
             {
               user_id: dto.userId,
