@@ -16,11 +16,12 @@ export interface UserPreferences {
   favoriteCuisines?: string[];
   leastFavoriteCuisines?: string[];
   foodAllergies?: string[];
+  dietType?: string[];
   dietaryRestrictions?: string[];
   flavorPreferences?: string[];
-  diningPreferences?: string[];
-  diningFrequency?: string;
-  mealPreference?: string;
+  mealOccasionPreferences?: string[];
+  diningTimePreferences?: string;
+  preferredMealTypes?: string;
 }
 
 @Injectable()
@@ -37,10 +38,10 @@ export class PreferencesService {
           food_allergies: dto.foodAllergies?.join(',') ?? null,
           diet_type: dto.dietType?.join(',') ?? null,
           dietary_restrictions: dto.dietaryRestrictions?.join(',') ?? null,
-          preferred_atmosphere: dto.preferredAtmosphere?.join(',') ?? null,
-          dining_frequency: dto.diningFrequency ?? null,
-          meal_preference: dto.preferredAtmosphere ?? null,
           flavor_preferences: dto.flavorPreferences?.join(',') ?? null,
+          preferred_atmosphere: dto.mealOccasionPreferences?.join(',') ?? null,
+          dining_frequency: dto.diningTimePreferences ?? null,
+          meal_preference: dto.preferredMealTypes ?? null,
         },
       ])
       .select()
