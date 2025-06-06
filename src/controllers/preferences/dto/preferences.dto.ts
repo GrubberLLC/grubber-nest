@@ -289,10 +289,9 @@ export class CreatePreferenceDto {
     type: [String],
     required: false,
   })
-  @IsArray()
+  @IsString()
   @IsOptional()
-  @IsString({ each: true })
-  diningTimePreferences?: string[];
+  diningTimePreferences?: string;
 
   @ApiProperty({
     description: 'Meal occasion preferences',
@@ -312,7 +311,7 @@ export class CreatePreferenceDto {
   @IsArray()
   @IsOptional()
   @IsString({ each: true })
-  preferredFlavors?: string[];
+  flavorPreferences?: string[];
 
   @ApiProperty({
     description: 'Disliked flavors',
@@ -382,16 +381,6 @@ export class CreatePreferenceDto {
   @IsOptional()
   @IsString({ each: true })
   willingnessToExplore?: string[];
-
-  @ApiProperty({
-    description: 'Rating criteria',
-    type: [String],
-    required: false,
-  })
-  @IsArray()
-  @IsOptional()
-  @IsString({ each: true })
-  ratingCriteria?: string[];
 }
 
 export class UpdatePreferenceDto extends CreatePreferenceDto {
