@@ -151,10 +151,9 @@ export class CreatePreferencesDto {
     type: [String],
     required: false,
   })
-  @IsArray()
+  @IsString()
   @IsOptional()
-  @IsString({ each: true })
-  diningFrequency?: string[];
+  diningFrequency?: string;
 
   @ApiProperty({
     description: 'Primary location',
@@ -361,10 +360,9 @@ export class CreatePreferenceDto {
     type: [String],
     required: false,
   })
-  @IsArray()
+  @IsString()
   @IsOptional()
-  @IsString({ each: true })
-  diningFrequency?: string[];
+  diningFrequency?: string;
 
   @ApiProperty({
     description: 'Primary location',
