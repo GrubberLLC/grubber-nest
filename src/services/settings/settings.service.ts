@@ -15,11 +15,11 @@ export class SettingsService {
 
   constructor(private readonly supabaseService: SupabaseService) {}
 
-  async createSettings(
-    userId: string,
-    primaryLocation: string,
-  ): Promise<UserSettings | null> {
-    this.logger.log(`Creating settings for user: ${userId}`);
+  async createSettings(dto: {
+    userId: string;
+    primaryLocation: string;
+  }): Promise<UserSettings | null> {
+    this.logger.log(`Creating settings for user: ${dto.userId}`);
 
     try {
       const supabase = this.supabaseService.client;
@@ -31,9 +31,9 @@ export class SettingsService {
           .from('UserSettings')
           .insert([
             {
-              user_id: userId,
+              user_id: dto.userId,
               privacy_level: 'Public',
-              primary_location: primaryLocation,
+              primary_location: dto.primaryLocation,
               primary_usage: 'All',
               receive_notifications: true,
               newsletter_subscription: true,
