@@ -27,29 +27,19 @@ export interface UserPreferences {
 export class PreferencesService {
   constructor(private readonly supabaseService: SupabaseService) {}
 
-  async create(
-    userId: string,
-    favoriteCuisines: string[],
-    leastFavoriteCuisines: string[],
-    foodAllergies: string[],
-    dietType: string[],
-    dietaryRestrictions: string[],
-    preferredAtmosphere: string[],
-    diningFrequency: string,
-  ): Promise<UserPreferences> {
-
+  async create(dto: CreatePreferencesDto): Promise<UserPreferences> {
     const response = await this.supabaseService.client
       .from('Preferences')
       .insert([
         {
-          user_id: userId,
-          favorite_cuisines: favoriteCuisines,
-          least_favorite_cuisines: leastFavoriteCuisines,
-          food_allergies: foodAllergies,
-          dietary_restrictions: dietaryRestrictions,
-          diet_type: dietType,
-          preferred_atmosphere: preferredAtmosphere,
-          dining_frequency: diningFrequency,
+          user_id: dto.userId,
+          favorite_cuisines: dto.favoriteCuisines?.join(',') ?? null,
+          least_favorite_cuisines: dto.leastFavoriteCuisines?.join(',') ?? null,
+          food_allergies: dto.foodAllergies?.join(',') ?? null,
+          diet_type: dto.dietType?.join(',') ?? null,
+          dietary_restrictions: dto.dietaryRestrictions?.join(',') ?? null,
+          preferred_atmosphere: dto.preferredAtmosphere?.join(',') ?? null,
+          dining_frequency: dto.diningFrequency ?? null,
         },
       ])
       .select()
