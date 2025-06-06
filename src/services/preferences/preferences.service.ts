@@ -26,17 +26,6 @@ export interface UserPreferences {
 @Injectable()
 export class PreferencesService {
   constructor(private readonly supabaseService: SupabaseService) {}
-
-  // userId,
-  //         favoriteCuisines,
-  //         leastFavoriteCuisines,
-  //         foodAlergies: allergies,
-  //         dietType: 'vegam',
-  //         dietaryRestrictions,
-  //         flavorPreferences,
-  //         diningPreferences,
-  //         diningFrequency,
-  //         mealPreference,
   async create(dto: CreatePreferencesDto): Promise<UserPreferences> {
     const response = await this.supabaseService.client
       .from('Preferences')

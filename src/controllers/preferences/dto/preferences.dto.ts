@@ -114,7 +114,7 @@ export class CreatePreferencesDto {
   @IsArray()
   @IsOptional()
   @IsString({ each: true })
-  preferredFlavors?: string[];
+  flavorPreferences?: string[];
 
   @ApiProperty({
     description: 'Disliked flavors',
@@ -184,17 +184,6 @@ export class CreatePreferencesDto {
   @IsOptional()
   @IsString({ each: true })
   willingnessToExplore?: string[];
-
-  @ApiProperty({
-    description: 'Rating criteria',
-    type: [String],
-    required: false,
-  })
-  @IsArray()
-  @IsOptional()
-  @IsString({ each: true })
-  ratingCriteria?: string[];
-  flavorPreferences?: string[];
 }
 
 export class UpdatePreferencesDto {
