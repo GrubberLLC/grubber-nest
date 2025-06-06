@@ -50,7 +50,7 @@ export class ProfileService {
         .from('Profiles')
         .insert([
           {
-            user_id: userId,
+            userId: userId,
             username: username,
             email: email,
             firstName: firstName,
