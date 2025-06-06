@@ -91,10 +91,9 @@ export class CreatePreferencesDto {
     type: [String],
     required: false,
   })
-  @IsArray()
+  @IsString()
   @IsOptional()
-  @IsString({ each: true })
-  diningTimePreferences?: string[];
+  diningTimePreferences?: string;
 
   @ApiProperty({
     description: 'Meal occasion preferences',
