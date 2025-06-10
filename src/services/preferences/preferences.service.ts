@@ -6,22 +6,28 @@ import {
 } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service.js';
 import {
-  CreatePreferencesDto,
   UpdatePreferencesDto,
+  CreatePreferencesDto,
 } from '../../controllers/preferences/dto/preferences.dto.js';
 import { PostgrestResponse } from '@supabase/supabase-js';
 
 export interface UserPreferences {
-  userId: string;
-  favoriteCuisines?: string[];
-  leastFavoriteCuisines?: string[];
-  foodAllergies?: string[];
-  dietType?: string[];
-  dietaryRestrictions?: string[];
-  flavorPreferences?: string[];
-  mealOccasionPreferences?: string[];
-  diningTimePreferences?: string;
-  preferredMealTypes?: string;
+  user_id: string;
+  favorite_cuisines?: string[];
+  least_favorite_cuisines?: string[];
+  diet?: string[];
+  allergies?: string[];
+  dietary_restrictions?: string[];
+  occasion?: string[];
+  meal_preferences?: string[];
+  dining_time?: string;
+  flavor?: string[];
+  least_flavors?: string[];
+  atmosphere?: string[];
+  travel_distance?: string;
+  frequency?: string;
+  explore?: boolean;
+  rating_criteria?: string;
 }
 
 @Injectable()
@@ -33,15 +39,21 @@ export class PreferencesService {
       .insert([
         {
           user_id: dto.userId,
-          favorite_cuisines: dto.favoriteCuisines?.join(',') ?? null,
-          least_favorite_cuisines: dto.leastFavoriteCuisines?.join(',') ?? null,
-          food_allergies: dto.foodAllergies?.join(',') ?? null,
-          diet_type: dto.dietType?.join(',') ?? null,
-          dietary_restrictions: dto.dietaryRestrictions?.join(',') ?? null,
-          flavor_preferences: dto.flavorPreferences?.join(',') ?? null,
-          preferred_atmosphere: dto.mealOccasionPreferences?.join(',') ?? null,
-          dining_frequency: dto.diningTimePreferences ?? null,
-          meal_preference: dto.preferredMealTypes ?? null,
+          favorite_cuisines: dto.favorite_cuisines?.join(',') ?? null,
+          least_favorite_cuisines:
+            dto.least_favorite_cuisines?.join(',') ?? null,
+          allergies: dto.allergies?.join(',') ?? null,
+          diet: dto.diet?.join(',') ?? null,
+          dietary_restrictions: dto.dietary_restrictions?.join(',') ?? null,
+          flavor: dto.flavor?.join(',') ?? null,
+          least_flavors: dto.least_flavors?.join(',') ?? null,
+          atmosphere: dto.atmosphere?.join(',') ?? null,
+          frequency: dto.frequency ?? null,
+          meal_preference: dto.meal_preference?.join(',') ?? null,
+          dining_time: dto.dining_time ?? null,
+          travel_distance: dto.travel_distance ?? null,
+          explore: dto.explore ?? null,
+          rating_criteria: dto.rating_criteria ?? null,
         },
       ])
       .select()

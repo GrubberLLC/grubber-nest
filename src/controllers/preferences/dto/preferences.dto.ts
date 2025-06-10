@@ -14,7 +14,7 @@ export class CreatePreferencesDto {
   @IsArray()
   @IsOptional()
   @IsString({ each: true })
-  favoriteCuisines?: string[];
+  favorite_cuisines?: string[];
 
   @ApiProperty({
     description: 'Least favorite cuisines',
@@ -24,7 +24,7 @@ export class CreatePreferencesDto {
   @IsArray()
   @IsOptional()
   @IsString({ each: true })
-  leastFavoriteCuisines?: string[];
+  least_favorite_cuisines?: string[];
 
   @ApiProperty({
     description: 'Cuisines willing to try',
@@ -34,7 +34,7 @@ export class CreatePreferencesDto {
   @IsArray()
   @IsOptional()
   @IsString({ each: true })
-  cuisinesWillingToTry?: string[];
+  diet?: string[];
 
   @ApiProperty({
     description: 'Diet type',
@@ -44,7 +44,7 @@ export class CreatePreferencesDto {
   @IsArray()
   @IsOptional()
   @IsString({ each: true })
-  dietType?: string[];
+  allergies?: string[];
 
   @ApiProperty({
     description: 'Food allergies',
@@ -54,7 +54,7 @@ export class CreatePreferencesDto {
   @IsArray()
   @IsOptional()
   @IsString({ each: true })
-  foodAllergies?: string[];
+  dietary_restrictions?: string[];
 
   @ApiProperty({
     description: 'Health preferences',
@@ -64,7 +64,7 @@ export class CreatePreferencesDto {
   @IsArray()
   @IsOptional()
   @IsString({ each: true })
-  healthPreferences?: string[];
+  meal_preference?: string[];
 
   @ApiProperty({
     description: 'Dietary restrictions',
@@ -74,25 +74,27 @@ export class CreatePreferencesDto {
   @IsArray()
   @IsOptional()
   @IsString({ each: true })
-  dietaryRestrictions?: string[];
+  dining_time?: string[];
 
   @ApiProperty({
-    description: 'Preferred meal types',
+    description: 'Dietary restrictions',
     type: [String],
     required: false,
   })
-  @IsString()
+  @IsArray()
   @IsOptional()
-  preferredMealTypes?: string;
+  @IsString({ each: true })
+  occasion?: string[];
 
   @ApiProperty({
     description: 'Dining time preferences',
     type: [String],
     required: false,
   })
-  @IsString()
+  @IsArray()
   @IsOptional()
-  diningTimePreferences?: string;
+  @IsString({ each: true })
+  flavor?: string[];
 
   @ApiProperty({
     description: 'Meal occasion preferences',
@@ -102,7 +104,7 @@ export class CreatePreferencesDto {
   @IsArray()
   @IsOptional()
   @IsString({ each: true })
-  mealOccasionPreferences?: string[];
+  least_flavors?: string[];
 
   @ApiProperty({
     description: 'Preferred flavors',
@@ -112,93 +114,46 @@ export class CreatePreferencesDto {
   @IsArray()
   @IsOptional()
   @IsString({ each: true })
-  flavorPreferences?: string[];
+  atmosphere?: string[];
 
   @ApiProperty({
     description: 'Disliked flavors',
     type: [String],
     required: false,
   })
-  @IsArray()
+  @IsString()
   @IsOptional()
-  @IsString({ each: true })
-  dislikedFlavors?: string[];
+  frequency?: string;
 
   @ApiProperty({
     description: 'Preferred atmosphere',
     type: [String],
     required: false,
   })
-  @IsArray()
+  @IsString()
   @IsOptional()
-  @IsString({ each: true })
-  preferredAtmosphere?: string[];
+  travel_distance?: string;
 
   @ApiProperty({
-    description: 'Dining companions',
+    description: 'Willing to explore',
     type: [String],
     required: false,
   })
-  @IsArray()
+  @IsBoolean()
   @IsOptional()
-  @IsString({ each: true })
-  diningCompanions?: string[];
+  explore?: boolean;
 
   @ApiProperty({
-    description: 'Dining frequency',
+    description: 'Rating criteria',
     type: [String],
     required: false,
   })
   @IsString()
   @IsOptional()
-  diningFrequency?: string;
-
-  @ApiProperty({
-    description: 'Primary location',
-    type: [String],
-    required: false,
-  })
-  @IsArray()
-  @IsOptional()
-  @IsString({ each: true })
-  primaryLocation?: string[];
-
-  @ApiProperty({
-    description: 'Travel distance',
-    type: [String],
-    required: false,
-  })
-  @IsArray()
-  @IsOptional()
-  @IsString({ each: true })
-  travelDistance?: string[];
-
-  @ApiProperty({
-    description: 'Willingness to explore',
-    type: [String],
-    required: false,
-  })
-  @IsArray()
-  @IsOptional()
-  @IsString({ each: true })
-  willingnessToExplore?: string[];
+  rating_criteria?: string;
 }
 
 export class UpdatePreferencesDto {
-  @ApiProperty({ description: 'User theme preference' })
-  @IsString()
-  theme?: string;
-
-  @ApiProperty({ description: 'User language preference' })
-  @IsString()
-  language?: string;
-
-  @ApiProperty({ description: 'Whether notifications are enabled' })
-  @IsBoolean()
-  notifications_enabled?: boolean;
-}
-
-export class CreatePreferenceDto {
   @ApiProperty({ description: 'User ID', example: '123' })
   @IsString()
   userId!: string;
@@ -379,16 +334,6 @@ export class CreatePreferenceDto {
   @IsOptional()
   @IsString({ each: true })
   willingnessToExplore?: string[];
-}
-
-export class UpdatePreferenceDto extends CreatePreferenceDto {
-  @ApiProperty({
-    description: 'Preference ID',
-    example: 1,
-    required: true,
-  })
-  @IsString()
-  preferenceId!: string;
 }
 
 export class GetPreferenceDto {

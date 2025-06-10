@@ -11,8 +11,9 @@ import {
 } from '@nestjs/common';
 import { PreferencesService } from '../../services/preferences/preferences.service.js';
 import {
-  CreatePreferenceDto,
-  UpdatePreferenceDto,
+  CreatePreferencesDto,
+  DeletePreferenceDto,
+  UpdatePreferencesDto,
 } from './dto/preferences.dto.js';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 
@@ -28,11 +29,11 @@ export class PreferencesController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create preference' })
-  @ApiBody({ type: CreatePreferenceDto })
+  @ApiBody({ type: CreatePreferencesDto })
   @ApiResponse({
     status: 201,
     description: 'Preference successfully created',
-    type: CreatePreferenceDto,
+    type: CreatePreferencesDto,
   })
   @ApiResponse({
     status: 500,
@@ -46,14 +47,14 @@ export class PreferencesController {
     },
   })
   async createPreference(
-    @Body() createPreferenceDto: CreatePreferenceDto,
-  ): Promise<CreatePreferenceDto> {
+    @Body() createPreferencesDto: CreatePreferencesDto,
+  ): Promise<CreatePreferencesDto> {
     try {
       const result = (await (
         this.preferencesService.create as (
           ...args: unknown[]
         ) => Promise<unknown>
-      )(createPreferenceDto)) as CreatePreferenceDto | null;
+      )(createPreferencesDto)) as CreatePreferencesDto | null;
       if (!result) {
         throw new Error('Failed to create preference');
       }
@@ -77,7 +78,7 @@ export class PreferencesController {
   @ApiResponse({
     status: 200,
     description: 'Preferences successfully retrieved',
-    type: [CreatePreferenceDto],
+    type: [CreatePreferencesDto],
   })
   @ApiResponse({
     status: 500,
@@ -92,13 +93,13 @@ export class PreferencesController {
   })
   async getPreferences(
     @Body('userId') userId: string,
-  ): Promise<CreatePreferenceDto[]> {
+  ): Promise<CreatePreferencesDto[]> {
     try {
       const result = (await (
         this.preferencesService.findAll as (
           ...args: unknown[]
         ) => Promise<unknown>
-      )(userId)) as CreatePreferenceDto[];
+      )(userId)) as CreatePreferencesDto[];
       return result;
     } catch (error: unknown) {
       const errorMessage =
@@ -116,11 +117,11 @@ export class PreferencesController {
   @Put()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update preference' })
-  @ApiBody({ type: UpdatePreferenceDto })
+  @ApiBody({ type: UpdatePreferencesDto })
   @ApiResponse({
     status: 200,
     description: 'Preference successfully updated',
-    type: UpdatePreferenceDto,
+    type: UpdatePreferencesDto,
   })
   @ApiResponse({
     status: 500,
@@ -134,17 +135,17 @@ export class PreferencesController {
     },
   })
   async updatePreference(
-    @Body() updatePreferenceDto: UpdatePreferenceDto,
-  ): Promise<UpdatePreferenceDto> {
+    @Body() updatePreferencesDto: UpdatePreferencesDto,
+  ): Promise<UpdatePreferencesDto> {
     try {
       const result = (await (
         this.preferencesService.update as (
           ...args: unknown[]
         ) => Promise<unknown>
       )(
-        updatePreferenceDto.preferenceId,
-        updatePreferenceDto,
-      )) as UpdatePreferenceDto | null;
+        updatePreferencesDto.preferenceId,
+        updatePreferencesDto,
+      )) as UpdatePreferencesDto | null;
       if (!result) {
         throw new Error('Failed to update preference');
       }
@@ -165,7 +166,7 @@ export class PreferencesController {
   @Delete()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete preference' })
-  @ApiBody({ type: UpdatePreferenceDto })
+  @ApiBody({ type: DeletePreferenceDto })
   @ApiResponse({
     status: 200,
     description: 'Preference successfully deleted',
