@@ -2,7 +2,6 @@ import {
   Injectable,
   NotFoundException,
   InternalServerErrorException,
-  Logger,
 } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service.js';
 import {
@@ -63,9 +62,6 @@ export class PreferencesService {
         response.error?.message || 'Failed to create preferences',
       );
     }
-    Logger.log(
-      `Preferences created successfully: ${JSON.stringify(response.data)}`,
-    );
     return response.data as UserPreferences;
   }
 
