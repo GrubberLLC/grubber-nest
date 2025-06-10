@@ -58,7 +58,6 @@ export class PreferencesService {
       ])
       .select()
       .single();
-    Logger.log(`Response: ${JSON.stringify(response)}`);
     if (response.error || !response.data) {
       throw new InternalServerErrorException(
         response.error?.message || 'Failed to create preferences',
