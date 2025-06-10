@@ -154,9 +154,13 @@ export class CreatePreferencesDto {
 }
 
 export class UpdatePreferencesDto {
-  @ApiProperty({ description: 'User ID', example: '123' })
+  @ApiProperty({
+    description: 'Preference ID',
+    example: 1,
+    required: true,
+  })
   @IsString()
-  userId!: string;
+  preferenceId!: string;
 
   @ApiProperty({
     description: 'Favorite cuisines',
