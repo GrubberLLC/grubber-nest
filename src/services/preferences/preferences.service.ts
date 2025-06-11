@@ -57,6 +57,8 @@ export class PreferencesService {
       ])
       .select()
       .single();
+
+    console.log(response);
     if (response.error || !response.data) {
       throw new InternalServerErrorException(
         response.error?.message || 'Failed to create preferences',
